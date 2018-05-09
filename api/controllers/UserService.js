@@ -14,6 +14,10 @@ const config = require('../../config.js');
 var async = require('async');
 var app = express();
 
+const dotenv = require('dotenv').config();
+const apiKey = process.env.SHOPIFY_API_KEY;
+const apiSecret = process.env.SHOPIFY_API_SECRET;
+
 app.use(function(req, res, next) {
  res.header('Access-Control-Allow-Origin', '*');
  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -161,9 +165,9 @@ exports.getProducts = function(args, res, next) {
 
 exports.getPriceSegment = function(args, res, next) {
   /**
-   * Get the list of all products 
+   * Get the list of all price segment
    * 
-   * returns Products
+   * returns price segment
    **/
    var response = [];
    connection.query('SELECT * from  tbl_pricesegment', function(err,result,fields){
@@ -223,9 +227,9 @@ exports.getPlans = function(args, res, next) {
 
 exports.getCountry = function(args, res, next) {
   /**
-   * Get the list of all products 
+   * Get the list of all country 
    * 
-   * returns Products
+   * returns Country
    **/
    var response = [];
    connection.query('SELECT * from  tbl_country', function(err,result,fields){
@@ -280,6 +284,44 @@ exports.getStateByCountry = function(args, res, next) {
      } else{
          res.status(400).send(err);
      }
+  });
+
+}
+
+exports.getAuthPermission = function(args, res, next) {
+  var response = {};
+  // GET to token page then make call to v1.flat-lay.com/externaltoken
+  //put token into request to shopify and return object 
+  var SHOP = /[^/]*$/.exec(args.url)[0];
+  var scopes = 'read_product_listings';
+  var redirect_uri = 'https://flat-lay.com/';
+  console.log('apiKey' +apiKey);
+  var response = {};
+  
+  https.get('https://'+ SHOP + '.myshopify.com/admin/oauth/authorize?client_id='+ apiKey +'&scope='+scopes+'&redirect_uri='+redirect_uri+'&state=asdf7894', function (res2) {
+      res2.on('data', function (data) {
+        var data = JSON.parse(data);
+        console.log('data: '+data);
+      });
+  });
+
+  
+}
+
+exports.getAccessToken = function(args, res, next) {
+  var response = {};
+  // GET to token page then make call to v1.flat-lay.com/externaltoken
+  //put token into request to shopify and return object 
+  var SHOP = /[^/]*$/.exec(args.url)[0];
+  var scopes = 'read_product_listings';
+  var redirect_uri = 'https://flat-lay.com';
+  
+  var response = {};
+  https.get('https://'+ SHOP +'/admin/oauth/access_token?client_id='+ apiKey +'&client_secret='+ apiSecret +'&code='+scopes+'&redirect_uri='+redirect_uri+'&state=asdf7894', function(res2) {
+      console.log(res2);
+
+  }).on('error', function(e) {
+    console.error(e);
   });
 
 }

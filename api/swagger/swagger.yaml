@@ -180,6 +180,30 @@ paths:
         404:
           description: "Country code not found"
       x-swagger-router-controller: "UserService"
+  /getAuthPermission/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get auth permission"
+      description: "Get auth permission"
+      operationId: "getAuthPermission"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The SHOP name for which needs auth permission"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid SHOP name"
+        404:
+          description: "Country code not found"
+      x-swagger-router-controller: "UserService"
   /swagger:
     x-swagger-pipe: swagger_raw
 

@@ -41,5 +41,9 @@ module.exports.getStateByCountry = function getStateByCountry (req, res, next) {
   User.getStateByCountry(req.swagger.params, res, next);
 };
 
+module.exports.getAuthPermission = function getAuthPermission (req, res, next) {
+  User.getAuthPermission(req.swagger.params, res, next);
+};
+
 
 module.exports = routes;
