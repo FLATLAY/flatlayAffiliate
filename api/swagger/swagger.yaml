@@ -1,0 +1,260 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Flatlay
+# during dev, should point to your local machine
+host: 127.0.0.1:10010
+# basePath prefixes all resource paths 
+basePath: /
+tags:
+- name: "merchant"
+  description: "Operations about merchant"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+- name: "general"
+  description: "General operations"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /merchant:
+    post:
+      tags:
+      - "merchant"
+      summary: "Merchant sign up"
+      description: "Sign up page for Merchant"
+      operationId: "createMerchant"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created merchant object"
+        required: true
+        schema:
+          $ref: "#/definitions/Merchant"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /categories:
+    post:
+      tags:
+      - "general"
+      summary: "Get list of categories"
+      description: "Get list of categories"
+      operationId: "getCategories"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /products:
+    post:
+      tags:
+      - "general"
+      summary: "Get list of products"
+      description: "Get list of products"
+      operationId: "getProducts"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /priceSegment:
+    post:
+      tags:
+      - "general"
+      summary: "Get list of price segment"
+      description: "Get list of price segment"
+      operationId: "getPriceSegment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getPlans:
+    post:
+      tags:
+      - "general"
+      summary: "Get list of Plans"
+      description: "Get list of getPlans"
+      operationId: "getPlans"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getCountry:
+    post:
+      tags:
+      - "general"
+      summary: "Get list of country"
+      description: "Get list of getCountry"
+      operationId: "getCountry"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getStateByCountry/{countryCode}:
+    get:
+      tags:
+      - "general"
+      summary: "Get states by country"
+      description: "Get states by country"
+      operationId: "getStateByCountry"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "countryCode"
+        in: "path"
+        description: "The country code that needs to be fetched."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid country code supplied"
+        404:
+          description: "Country code not found"
+      x-swagger-router-controller: "UserService"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+
+
+# complex objects have schema definitions
+definitions:
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  Merchant:
+    type: "object"
+    properties:
+      companyName:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      currentPassword:
+        type: "string"
+      category:
+        $ref: "#/definitions/Category"
+      productsID: 
+        type: "integer"
+        format: "int32"
+      priceSegmentID:
+        type: "integer"
+        format: "int32"
+      targetAudience:
+        type: "string"
+      webUrl:
+        type: "string"
+      streetAddress:
+        type: "string"
+      city:
+        type: "string"
+      zipcode:
+        type: "string"
+      countryID:
+        type: "integer"
+        format: "int32"
+      stateID:
+        type: "integer"
+        format: "int32"
+      phoneNumber:
+        type: "string"
+      planID:
+        type: "integer"
+        format: "int32"
+    xml:
+      name: "User"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  Category:
+    type: array
+    items:
+      type: integer
+  
