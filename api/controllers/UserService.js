@@ -41,13 +41,13 @@ exports.createMerchant = function(args, res, next) {
          email = args.body.email,
          password = args.body.currentPassword,
          category = args.body.category,
-         productsID = args.body.productsID,
+         productID = args.body.productID,
          priceSegmentID = args.body.priceSegmentID,
          targetAudience = args.body.targetAudience,
          webUrl = args.body.webUrl,
          streetAddress = args.body.streetAddress,
          city = args.body.city,
-         zipcode = args.body.zipcode,
+         zipCode = args.body.zipCode,
          countryID = args.body.countryID,
          stateID = args.body.stateID,
          phoneNumber = args.body.phoneNumber,
@@ -55,17 +55,17 @@ exports.createMerchant = function(args, res, next) {
          createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
          
       let insertMerchantID;
-      connection.query('INSERT INTO tbl_merchant (CompanyName, FirstName, LastName, Password, Email, WebUrl, ProductsID, PriceSegmentID, TargetAudience, StreetAddress, City, Zipcode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
+      connection.query('INSERT INTO tbl_merchant (CompanyName, FirstName, LastName, Password, Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-           [companyName, firstName, lastName, password, email, webUrl, productsID, priceSegmentID, targetAudience, streetAddress, city, zipcode, countryID, stateID, phoneNumber, planID, createDate],
+           [companyName, firstName, lastName, password, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
           function(err,result){
             if(!err){
               if(result.affectedRows != 0){
                 insertMerchantID = result.insertId;
                 for(var i = 0; i < category.length;i++){
-                  connection.query('INSERT INTO tbl_merchant_categories (MerchantID, CategoryID )\
+                  connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
                      VALUES (?,?)',
-                     [insertMerchantID,category[i]],
+                     [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
                     function(err,result){
                       if(!err){
                         
@@ -135,7 +135,7 @@ exports.getProducts = function(args, res, next) {
    * returns Products
    **/
    var response = [];
-   connection.query('SELECT * from tbl_products', function(err,result,fields){
+   connection.query('SELECT * from tbl_product', function(err,result,fields){
      if(!err){
 
        console.log("What is result.length??")
@@ -197,7 +197,7 @@ exports.getPlans = function(args, res, next) {
    * returns Plans
    **/
    var response = [];
-   connection.query('SELECT * from  tbl_plans', function(err,result,fields){
+   connection.query('SELECT * from  tbl_plan', function(err,result,fields){
      if(!err){
 
        console.log("What is result.length??")
@@ -260,7 +260,7 @@ exports.getStateByCountry = function(args, res, next) {
    **/
    var countryCode = /[^/]*$/.exec(args.url)[0];
    var response = [];
-   connection.query('SELECT * from  tbl_state where countryCode = ?', countryCode, function(err,result,fields){
+   connection.query('SELECT tbl_state.*,tbl_country.CountryCode from  tbl_country JOIN tbl_state ON tbl_state.CountryID = tbl_country.CountryID where tbl_country.countryCode = ?', countryCode, function(err,result,fields){
      if(!err){
 
        console.log("What is result.length??")
