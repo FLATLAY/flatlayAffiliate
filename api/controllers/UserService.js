@@ -8,15 +8,18 @@ var http     = require('http'),
     session = require('express-session'),
     nodemailer = require('nodemailer'),
     https   = require('https'),
-    request = require('request');
+    request = require('request-promise');
 
 const config = require('../../config.js');
 var async = require('async');
 var app = express();
 
 const dotenv = require('dotenv').config();
-const apiKey = process.env.SHOPIFY_API_KEY;
-const apiSecret = process.env.SHOPIFY_API_SECRET;
+const crypto = require('crypto');
+const cookie = require('cookie');
+const nonce = require('nonce')();
+const querystring = require('querystring');
+
 
 app.use(function(req, res, next) {
  res.header('Access-Control-Allow-Origin', '*');
@@ -35,11 +38,12 @@ exports.createMerchant = function(args, res, next) {
    * no response value expected for this operation
    **/
 
-   var response = [];
+   var response = {};
    if(
-     typeof args.body.email !== 'undefined'
+     typeof args.body.email !== 'undefined' || args.body.shopName !== 'undefined'
    ){
      var companyName = args.body.companyName,
+         shopName = args.body.shopName,
          firstName = args.body.firstName,
          lastName = args.body.lastName,
          email = args.body.email,
@@ -59,9 +63,9 @@ exports.createMerchant = function(args, res, next) {
          createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
          
       let insertMerchantID;
-      connection.query('INSERT INTO tbl_merchant (CompanyName, FirstName, LastName, Password, Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-           [companyName, firstName, lastName, password, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
+      connection.query('INSERT INTO tbl_merchant (CompanyName, ShopName, FirstName, LastName, Password, Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+           [companyName, shopName, firstName, lastName, password, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
           function(err,result){
             if(!err){
               if(result.affectedRows != 0){
@@ -72,17 +76,18 @@ exports.createMerchant = function(args, res, next) {
                      [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
                     function(err,result){
                       if(!err){
-                        
+                          
                       }else{
                         
                       }
                   });
                 }
-                
+                response.result = 'success';
+                response.msg = 'New merchant created';
               }else{
-                response.push({'msg' : 'No Result Found'});
+                response.result = 'error';
+                response.msg = 'Something is wrong. Please try again later';
               }
-              response.push({'result' : 'success','data':{ 'msg': 'New merchant created' } });
               res.setHeader('Content-Type', 'application/json');
               res.status(200).send(JSON.stringify(response));
             }else{
@@ -94,7 +99,8 @@ exports.createMerchant = function(args, res, next) {
       
    }
    else{
-     response.push({'result' : 'error', 'msg' : 'Please fill required details'});
+     response.result = 'error';
+     response.msg = 'Please fill required details';
      res.setHeader('Content-Type', 'application/json');
      res.status(200).send(JSON.stringify(response));
    }
@@ -107,7 +113,7 @@ exports.getCategories = function(args, res, next) {
    * 
    * returns Categories
    **/
-   var response = [];
+   var response = {};
    connection.query('SELECT * from tbl_category', function(err,result,fields){
      if(!err){
 
@@ -115,13 +121,13 @@ exports.getCategories = function(args, res, next) {
        console.log(result.length);
 
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
+         response = {'result' : 'success', 'data' : result};
          console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -138,7 +144,7 @@ exports.getProducts = function(args, res, next) {
    * 
    * returns Products
    **/
-   var response = [];
+   var response = {};
    connection.query('SELECT * from tbl_product', function(err,result,fields){
      if(!err){
 
@@ -146,13 +152,13 @@ exports.getProducts = function(args, res, next) {
        console.log(result.length);
 
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
+         response = {'result' : 'success', 'data' : result};
          console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -169,7 +175,7 @@ exports.getPriceSegment = function(args, res, next) {
    * 
    * returns price segment
    **/
-   var response = [];
+   var response = {};
    connection.query('SELECT * from  tbl_pricesegment', function(err,result,fields){
      if(!err){
 
@@ -177,13 +183,13 @@ exports.getPriceSegment = function(args, res, next) {
        console.log(result.length);
 
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
+         response = {'result' : 'success', 'data' : result};
          console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -200,7 +206,7 @@ exports.getPlans = function(args, res, next) {
    * 
    * returns Plans
    **/
-   var response = [];
+   var response = {};
    connection.query('SELECT * from  tbl_plan', function(err,result,fields){
      if(!err){
 
@@ -208,13 +214,13 @@ exports.getPlans = function(args, res, next) {
        console.log(result.length);
 
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
+         response = {'result' : 'success', 'data' : result};
          console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -231,7 +237,7 @@ exports.getCountry = function(args, res, next) {
    * 
    * returns Country
    **/
-   var response = [];
+   var response = {};
    connection.query('SELECT * from  tbl_country', function(err,result,fields){
      if(!err){
 
@@ -239,13 +245,13 @@ exports.getCountry = function(args, res, next) {
        console.log(result.length);
 
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
+         response = {'result' : 'success', 'data' : result};
          console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -263,21 +269,16 @@ exports.getStateByCountry = function(args, res, next) {
    * returns Products
    **/
    var countryCode = /[^/]*$/.exec(args.url)[0];
-   var response = [];
+   var response = {};
    connection.query('SELECT tbl_state.*,tbl_country.CountryCode from  tbl_country JOIN tbl_state ON tbl_state.CountryID = tbl_country.CountryID where tbl_country.countryCode = ?', countryCode, function(err,result,fields){
      if(!err){
-
-       console.log("What is result.length??")
-       console.log(result.length);
-
        if(result.length !=0){
-         response.push({'result' : 'success', 'data' : result});
-         console.log(response);
+         response = {'result' : 'success', 'data' : result};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
        else{
-         response.push({'result' : 'error', 'msg' : 'No results found'});
+         response = {'result' : 'error', 'msg' : 'No results found'};
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -288,40 +289,44 @@ exports.getStateByCountry = function(args, res, next) {
 
 }
 
-exports.getAuthPermission = function(args, res, next) {
+exports.generateAccessToken = function(args, res, next) {
+ 
   var response = {};
-  // GET to token page then make call to v1.flat-lay.com/externaltoken
-  //put token into request to shopify and return object 
-  var SHOP = /[^/]*$/.exec(args.url)[0];
-  var scopes = 'read_product_listings';
-  var redirect_uri = 'https://flat-lay.com/';
-  console.log('apiKey' +apiKey);
-  var response = {};
+  // Generate access token from this url
+  var shop = /[^/]*$/.exec(args.url)[0]+'.myshopify.com';
   
-  https.get('https://'+ SHOP + '.myshopify.com/admin/oauth/authorize?client_id='+ apiKey +'&scope='+scopes+'&redirect_uri='+redirect_uri+'&state=asdf7894', function (res2) {
-      res2.on('data', function (data) {
-        var data = JSON.parse(data);
-        console.log('data: '+data);
-      });
-  });
-
+  var url = HOSTNAME+"/shopify?shop="+shop+""; // Replace this with your HTTPS Forwarding address
+  response.result = 'success';
+  response.msg = 'Access this url in browser to generate access token -> '+url+'';
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200).send(JSON.stringify(response));
   
 }
 
 exports.getAccessToken = function(args, res, next) {
-  var response = {};
-  // GET to token page then make call to v1.flat-lay.com/externaltoken
-  //put token into request to shopify and return object 
-  var SHOP = /[^/]*$/.exec(args.url)[0];
-  var scopes = 'read_product_listings';
-  var redirect_uri = 'https://flat-lay.com';
   
   var response = {};
-  https.get('https://'+ SHOP +'/admin/oauth/access_token?client_id='+ apiKey +'&client_secret='+ apiSecret +'&code='+scopes+'&redirect_uri='+redirect_uri+'&state=asdf7894', function(res2) {
-      console.log(res2);
-
-  }).on('error', function(e) {
-    console.error(e);
+  // Get access token from database by shop name and display
+  var shop = /[^/]*$/.exec(args.url)[0];
+  connection.query('SELECT * from tbl_merchant where ShopName = ?', shop, function(err,result,fields){
+    if(!err && result.length > 0){
+        if(result[0].AccessToken != ''){
+          response.result = 'success';
+          response.accessToken = result[0].AccessToken;
+        }else{
+          response.result = 'error';
+          response.accessToken = 'AccessToken not generated yet or Invalid shop name';
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(200).send(JSON.stringify(response));
+    }else{
+      response.result = 'error';
+      response.msg = 'Shop not found or Invalid shop name';
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).send(JSON.stringify(response));
+    }
   });
 
 }

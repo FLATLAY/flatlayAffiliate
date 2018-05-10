@@ -180,29 +180,53 @@ paths:
         404:
           description: "Country code not found"
       x-swagger-router-controller: "UserService"
-  /getAuthPermission/{SHOP}:
+  /generateAccessToken/{SHOP}:
     get:
       tags:
       - "merchant"
-      summary: "Get auth permission"
-      description: "Get auth permission"
-      operationId: "getAuthPermission"
+      summary: "Get authorization and generate new Accesstoken"
+      description: "Get authorization and generate new Accesstoken"
+      operationId: "generateAccessToken"
       produces:
       - "application/xml"
       - "application/json"
       parameters:
       - name: "SHOP"
         in: "path"
-        description: "The SHOP name for which needs auth permission"
+        description: "The shop name for which needs to generate AccessToken"
         required: true
         type: "string"
       responses:
         200:
-          description: "successful operation"
+          description: "Successful operation"
         400:
-          description: "Invalid SHOP name"
+          description: "Invalid shop name"
         404:
-          description: "Country code not found"
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /getAccessToken/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get generated accesstoken"
+      description: "Get generated accesstoken"
+      operationId: "getAccessToken"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs Accesstoken"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
       x-swagger-router-controller: "UserService"
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -227,6 +251,8 @@ definitions:
     type: "object"
     properties:
       companyName:
+        type: "string"
+      shopName:
         type: "string"
       firstName:
         type: "string"

@@ -41,8 +41,12 @@ module.exports.getStateByCountry = function getStateByCountry (req, res, next) {
   User.getStateByCountry(req.swagger.params, res, next);
 };
 
-module.exports.getAuthPermission = function getAuthPermission (req, res, next) {
-  User.getAuthPermission(req.swagger.params, res, next);
+module.exports.generateAccessToken = function generateAccessToken (req, res, next) {
+  User.generateAccessToken(req.swagger.params, res, next);
+};
+
+module.exports.getAccessToken = function getAccessToken (req, res, next) {
+  User.getAccessToken(req.swagger.params, res, next);
 };
 
 
