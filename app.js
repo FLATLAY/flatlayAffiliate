@@ -11,12 +11,25 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var config = require('./config.js');
+//var react = require('react');
+//var reactdom = require('react-dom');
+//var polaris = require('./polaris.js');
 var cors = require('cors');
 var moment = require('moment');
 //New Setup express
 var app = express();
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var bodyParser = require('body-parser');
+//import {AppProvider, Button} from '@shopify/polaris';
+const webpack = require('webpack');
+const webpackMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
+const webpackconfig = require('./config/webpack.config.js');
+
+const ShopifyAPIClient = require('shopify-api-node');
+const ShopifyExpress = require('@shopify/shopify-express');
+const {MemoryStrategy} = require('@shopify/shopify-express/strategies');
 
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
@@ -33,7 +46,26 @@ app.use(cors());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 10010);
+/* React */
+// const compiler = webpack(webpackconfig);
+// const middleware = webpackMiddleware(compiler, {
+//   hot: true,
+//   inline: true,
+//   publicPath: webpackconfig.output.publicPath,
+//   contentBase: 'src',
+//   stats: {
+//     colors: true,
+//     hash: false,
+//     timings: true,
+//     chunks: false,
+//     chunkModules: false,
+//     modules: false,
+//   },
+// });
 
+// app.use(middleware);
+// app.use(webpackHotMiddleware(compiler));
+/* end React */
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/swagger.json'),
@@ -80,19 +112,23 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
    next();
   });
 
+  app.use(express.static(__dirname + '/public'));
+  
   app.get('/shopify', (req, res) => {
     const shop = req.query.shop;
     if (shop) {
       const state = nonce();
       const redirectUri = HOSTNAME + '/shopify/callback';
-      const installUrl = 'https://' + shop +
+      const installUrl = 'https://' + shop +'.myshopify.com'+
         '/admin/oauth/authorize?client_id=' + APIKEY +
         '&scope=' + scopes +
         '&state=' + state +
         '&redirect_uri=' + redirectUri;
+        console.log(installUrl);
 
       res.cookie('state', state);
       res.redirect(installUrl);
+      
     } else {
       return res.status(400).send('Missing shop parameter. Please add ?shop=your-development-shop.myshopify.com to your request');
     }
@@ -143,27 +179,26 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
       request.post(accessTokenRequestUrl, { json: accessTokenPayload })
       .then((accessTokenResponse) => {
-        const accessToken = accessTokenResponse.access_token;
-        var shopName = shop.replace(".myshopify.com", "");
-        connection.query('UPDATE tbl_merchant SET Code = ?,AccessToken = ?,UpdateDate = ? WHERE ShopName = ?', [code,accessToken,moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),shopName], 
-          function(err,result,fields){
-            if(!err){
-              if(result.affectedRows > 0){
-                console.log('AccessToken updated in DB');
-              }
-            }else{
-              console.log('error in update query');
-            }
-          }
-        );
-        res.status(200).send('Your access token is '+accessToken);
+        const installUrl = HOSTNAME + '/accountconnection';
+        
+        res.redirect(installUrl);
+        
       })
       .catch((error) => {
         res.status(error.statusCode).send(error.error.error_description);
       });
+
     } else {
       res.status(400).send('Required parameters missing');
     }
+  });
+
+  app.get('/accountconnection', (req, res) => {
+    fs.readFile('api/views/index.html', function(err, page) {
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write(page);
+        res.end();
+    });
   });
     
   reload(app);

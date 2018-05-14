@@ -1,0 +1,115 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://sdks.shopifycdn.com/polaris/2.0.0/polaris.min.css" />
+		<script src="https://cdn.shopify.com/s/assets/external/app.js"></script>
+		<script type="text/javascript">
+		   var url = window.location.href;
+		    if(!url.match(/\&(?:shop)\=([\S\s]*?)\.myshopify.com/)){
+		        url = document.referrer;
+		        var shop = url.match(/\&(?:shop)\=([\S\s]*?)\.myshopify.com/)[1];
+		    }else{
+		        var shop = url.match(/\&(?:shop)\=([\S\s]*?)\.myshopify.com/)[1];
+		    }
+			ShopifyApp.init({
+				apiKey: 'd3a383b53effb191ccc1251229feac24',
+				shopOrigin: 'https://'+shop+'.myshopify.com',
+				debug: true,
+				forceRedirect: true
+			});
+			ShopifyApp.ready(function() {
+				ShopifyApp.Bar.initialize({
+					title: 'Account',
+					icon: 'https://flat-lay.com/images/flatlay_text_white.png'
+				});
+			});
+		</script>
+	</head>
+	<body>
+	<div class="Polaris-Page">
+    <div class="Polaris-Page__Header">
+    
+    </div>
+    <div id="root"></div>
+    <div class="Polaris-Page__Content">
+      <div class="Polaris-Layout">
+        <div class="Polaris-Layout__AnnotatedSection">
+          <div class="Polaris-Layout__AnnotationWrapper">
+            <div class="Polaris-Layout__Annotation">
+              <div class="Polaris-TextContainer">
+                <h2 class="Polaris-Heading">FLATLAY Account</h2>
+                <p>Submit your store for approval to connect your Shopify and FLATLAY accounts together.</p>
+					<p>If you need further help, contact <a class="colorLink" href="mailto:support@theflatlay.com?subject=FLATLAY® - Shopify Enquiry">support@theflatlay.com</a> for assistance.</p>
+              </div>
+            </div>
+            <div class="Polaris-Layout__AnnotationContent">
+              <div class="Polaris-Card">
+                <div class="Polaris-Card__Section">
+                  <div class="Polaris-SettingAction">
+                    <div class="Polaris-SettingAction__Setting">
+                      <div class="Polaris-Stack">
+                        <div class="Polaris-Stack__Item Polaris-Stack__Item--fill">
+                          <div class="Polaris-AccountConnection__Content">
+                            <div>
+                              <span class="Polaris-TextStyle--variationSubdued">No FLATLAY merchant account connected
+                                
+                                
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="Polaris-SettingAction__Action">
+                      <form>
+                        <button class="Polaris-Button Polaris-Button--primary" ng-click="connectAccount()">
+                          <span class="Polaris-Button__Content">
+                            <span>Account Signup</span>
+                          </span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="Polaris-AccountConnection__TermsOfService">
+                    <ul class="Polaris-List Polaris-List--typeBullet">
+                      <li class="Polaris-List__Item">Standard Unlimited sales transactions on the FLATLAY Platform.</li>
+                    </ul>
+                  </div>
+                  <div class="Polaris-AccountConnection__TermsOfService">
+                    <p>
+                      By signing up, you accept FLATLAY's <a class="colorLink" target="_blank" href="https://flat-lay.com/terms">terms of service.</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="Polaris-Layout__Section">
+          <div class="Polaris-FooterHelp">
+            <div class="Polaris-FooterHelp__Content">
+              <div class="Polaris-FooterHelp__Icon">
+                <span class="Polaris-Icon Polaris-Icon--colorTeal Polaris-Icon--hasBackdrop">
+                <svg class="Polaris-Icon__Svg" viewBox="0 0 20 20">
+                  <g fill-rule="evenodd">
+                    <path d="M6 4.038a2 2 0 1 0-3.999-.001A2 2 0 0 0 6 4.038zm2 0c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zM18 4a2 2 0 1 0-3.999-.001A2 2 0 0 0 18 4zm2 0c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zm-2 12a2 2 0 1 0-3.999-.001A2 2 0 0 0 18 16zm2 0c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zm-14 .038a2 2 0 1 0-3.999-.001A2 2 0 0 0 6 16.038zm2 0c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4z" fill-rule="nonzero"></path>
+                    <path d="M18 10.038a8 8 0 1 1-16 0 8 8 0 0 1 16 0zM10 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" fill="currentColor"></path>
+                    <path d="M17 10.038a7 7 0 1 0-14 0 7 7 0 0 0 14 0zm2 0a9 9 0 1 1-18.001-.001A9 9 0 0 1 19 10.038z" fill-rule="nonzero"></path>
+                    <path d="M13 10.038a3 3 0 1 0-6 0 3 3 0 0 0 6 0zm2 0c0 2.76-2.24 5-5 5s-5-2.24-5-5 2.24-5 5-5 5 2.24 5 5z" fill-rule="nonzero"></path>
+                    <path d="M13.707 7.707l2-2a1 1 0 0 0-1.414-1.414l-2 2a1 1 0 0 0 1.414 1.414zm-1.414 6l2 2a1 1 0 0 0 1.414-1.414l-2-2a1 1 0 0 0-1.414 1.414zM7.707 6.33l-2-2a1 1 0 0 0-1.414 1.415l2 2a1 1 0 0 0 1.414-1.414zm-1.414 6l-2 2a1 1 0 0 0 1.414 1.415l2-2a1 1 0 0 0-1.414-1.414z" fill-rule="nonzero"></path>
+                  </g>
+                </svg>
+              </span>
+              </div>
+              <div class="Polaris-FooterHelp__Text">
+                Learn more about <a class="Polaris-Link" target="_blank" href="https://flat-lay.com/brands" data-polaris-unstyled="true">selling on FLATLAY</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+	</body>
+</html>
