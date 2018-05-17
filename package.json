@@ -8,43 +8,33 @@
   "license": "",
   "main": "app.js",
   "dependencies": {
-    "@shopify/polaris": "^2.0.0",
-    "@shopify/shopify-express": "^1.0.0-alpha.7",
-    "amazon-product-api": "^0.4.4",
-    "autoprefixer": "^8.5.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "connect": "^3.2.0",
-    "cookie": "^0.3.1",
-    "cors": "^2.8.4",
-    "dotenv": "^5.0.1",
-    "express": "^4.16.3",
-    "js-yaml": "^3.3.0",
-    "jshint-loader": "^0.8.4",
-    "moment": "^2.18.1",
-    "morgan": "^1.9.0",
-    "mysql": "^2.14.1",
-    "nodemailer": "^4.6.4",
-    "nonce": "^1.0.4",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
-    "reload": "^2.2.2",
-    "request": "^2.85.0",
-    "request-promise": "^4.2.2",
-    "shopify-api-node": "^2.14.0",
-    "swagger-express": "^1.0.5",
-    "swagger-tools": "0.10.1",
-    "webpack-dev-server": "^3.1.4",
-    "webpack-hot-middleware": "^2.22.2"
+     "@shopify/polaris": "^2.0.0",
+     "@shopify/shopify-express": "^1.0.0-alpha.7",
+     "amazon-product-api": "^0.4.4",
+     "connect": "^3.2.0",
+     "cookie": "^0.3.1",
+     "cors": "^2.8.4",
+     "dotenv": "^5.0.1",
+     "express": "^4.16.3",
+     "js-yaml": "^3.3.0",
+     "moment": "^2.18.1",
+     "morgan": "^1.9.0",
+     "mysql": "^2.14.1",
+     "nodemailer": "^4.6.4",
+     "nonce": "^1.0.4",
+     "react": "^16.3.2",
+     "react-dom": "^16.3.2",
+     "reload": "^2.2.2",
+     "request": "^2.85.0",
+     "request-promise": "^4.2.2",
+     "swagger-express": "^1.0.5",
+     "swagger-tools": "0.10.1"
   },
   "devDependencies": {
     "should": "^7.1.0",
-    "supertest": "^1.0.0",
-    "webpack": "^4.8.3"
-  },
+    "supertest": "^1.0.0"
+   },
   "scripts": {
-    "start": "node app.js webpack-dev-server"
-  }
+    "start": "node app.js"
+   }
 }

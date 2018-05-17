@@ -11,26 +11,11 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var config = require('./config.js');
-//var react = require('react');
-//var reactdom = require('react-dom');
-//var polaris = require('./polaris.js');
 var cors = require('cors');
 var moment = require('moment');
 //New Setup express
 var app = express();
 var logger = require('morgan');
-var bodyParser = require('body-parser');
-var bodyParser = require('body-parser');
-//import {AppProvider, Button} from '@shopify/polaris';
-const webpack = require('webpack');
-const webpackMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
-const webpackconfig = require('./config/webpack.config.js');
-
-const ShopifyAPIClient = require('shopify-api-node');
-const ShopifyExpress = require('@shopify/shopify-express');
-const {MemoryStrategy} = require('@shopify/shopify-express/strategies');
-
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
 const cookie = require('cookie');
@@ -46,26 +31,6 @@ app.use(cors());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 10010);
-/* React */
-// const compiler = webpack(webpackconfig);
-// const middleware = webpackMiddleware(compiler, {
-//   hot: true,
-//   inline: true,
-//   publicPath: webpackconfig.output.publicPath,
-//   contentBase: 'src',
-//   stats: {
-//     colors: true,
-//     hash: false,
-//     timings: true,
-//     chunks: false,
-//     chunkModules: false,
-//     modules: false,
-//   },
-// });
-
-// app.use(middleware);
-// app.use(webpackHotMiddleware(compiler));
-/* end React */
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/swagger.json'),
@@ -97,10 +62,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.use(logger(':method :url :status :res[content-length] - :response-time ms')); //replaces your app.use(express.logger());
 
   // parse application/json
-  app.use(bodyParser.json());                        
+  app.use(parser.json());                        
 
   // parse application/x-www-form-urlencoded
-  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(parser.urlencoded({ extended: true }));
 
   app.use(function(req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
@@ -179,9 +144,9 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
       request.post(accessTokenRequestUrl, { json: accessTokenPayload })
       .then((accessTokenResponse) => {
-        const installUrl = HOSTNAME + '/accountconnection';
+        const accessToken = accessTokenResponse.access_token;
+        return res.status(200).send('Accesstoken: '+accessToken);
         
-        res.redirect(installUrl);
         
       })
       .catch((error) => {
@@ -191,14 +156,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     } else {
       res.status(400).send('Required parameters missing');
     }
-  });
-
-  app.get('/accountconnection', (req, res) => {
-    fs.readFile('api/views/index.html', function(err, page) {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.write(page);
-        res.end();
-    });
   });
     
   reload(app);

@@ -70,17 +70,19 @@ exports.createMerchant = function(args, res, next) {
             if(!err){
               if(result.affectedRows != 0){
                 insertMerchantID = result.insertId;
-                for(var i = 0; i < category.length;i++){
-                  connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
-                     VALUES (?,?)',
-                     [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
-                    function(err,result){
-                      if(!err){
+                if(category){
+                  for(var i = 0; i < category.length;i++){
+                    connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
+                       VALUES (?,?)',
+                       [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
+                      function(err,result){
+                        if(!err){
+                            
+                        }else{
                           
-                      }else{
-                        
-                      }
-                  });
+                        }
+                    });
+                  }
                 }
                 response.result = 'success';
                 response.msg = 'New merchant created';
