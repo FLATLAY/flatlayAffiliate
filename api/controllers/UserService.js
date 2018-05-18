@@ -91,11 +91,11 @@ exports.createMerchant = function(args, res, next) {
                 response.msg = 'Something is wrong. Please try again later';
               }
               res.setHeader('Content-Type', 'application/json');
-              res.status(200).send(JSON.stringify(response));
+              return res.status(200).send(JSON.stringify(response));
             }else{
               console.log("err", err);
               console.log("errresult", result);
-              res.status(400).send(err);
+              return res.status(400).send(err);
             }
         });
       
@@ -104,7 +104,7 @@ exports.createMerchant = function(args, res, next) {
      response.result = 'error';
      response.msg = 'Please fill required details';
      res.setHeader('Content-Type', 'application/json');
-     res.status(200).send(JSON.stringify(response));
+     return res.status(200).send(JSON.stringify(response));
    }
   
 }
@@ -325,6 +325,29 @@ exports.getAccessToken = function(args, res, next) {
     }else{
       response.result = 'error';
       response.msg = 'Shop not found or Invalid shop name';
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).send(JSON.stringify(response));
+    }
+  });
+
+}
+
+exports.getShopDataByShopName = function(args, res, next) {
+  
+  var response = {};
+  // Get access token from database by shop name and display
+  var shop = /[^/]*$/.exec(args.url)[0];
+  connection.query('SELECT * from tbl_merchant where ShopName = ?', shop, function(err,result,fields){
+    if(!err && result.length > 0){
+        response.result = 'success';
+        response.data = result;
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(200).send(JSON.stringify(response));
+    }else{
+      response.result = 'error';
+      response.data = 'Shop not found or Invalid shop name';
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.status(400).send(JSON.stringify(response));

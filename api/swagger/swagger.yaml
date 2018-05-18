@@ -228,6 +228,30 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /getShopDataByShopName/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get shop data by shop name"
+      description: "Get shop data by shop name"
+      operationId: "getShopDataByShopName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs Accesstoken"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
   /swagger:
     x-swagger-pipe: swagger_raw
 

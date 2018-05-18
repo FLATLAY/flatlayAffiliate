@@ -80,6 +80,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.use(express.static(__dirname + '/public'));
   
   app.get('/shopify', (req, res) => {
+    // EX. shop will be ipsteststore here
     const shop = req.query.shop;
     if (shop) {
       const state = nonce();
@@ -100,6 +101,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   });
 
   app.get('/shopify/callback', (req, res) => {
+    // EX. shop will be ipsteststore.myshopify.com here
     const { shop, hmac, code, state } = req.query;
     const stateCookie = cookie.parse(req.headers.cookie).state;
 
@@ -144,8 +146,36 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
       request.post(accessTokenRequestUrl, { json: accessTokenPayload })
       .then((accessTokenResponse) => {
+        
         const accessToken = accessTokenResponse.access_token;
-        return res.status(200).send('Accesstoken: '+accessToken);
+        // DONE: Use access token to make API call to 'shop' endpoint
+        const shopRequestUrl = 'https://' + shop + '/admin/shop.json';
+        const shopRequestHeaders = {
+          'X-Shopify-Access-Token': accessToken,
+        };
+        var shopName = shop.replace('.myshopify.com','');
+        var shopName = shopName,
+         createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+        connection.query('INSERT INTO tbl_merchant (ShopName, Code, AccessToken, CreateDate )\
+           VALUES (?,?,?,?)',
+           [shopName, code, accessToken, createDate],
+          function(err,result){
+            if(!err){
+              if(result.affectedRows != 0){
+                var insertMerchantID = result.insertId;
+                console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                return res.status(200).send('Accesstoken: '+accessToken);
+              }else{
+                return res.status(200).send('Query is correct but some thing is wrong with network');
+              }
+            }else{
+              console.log("err", err);
+              console.log("errresult", result);
+              return res.status(400).send(err);
+            }
+          });
+
+        
         
         
       })

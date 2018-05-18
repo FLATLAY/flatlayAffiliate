@@ -49,5 +49,9 @@ module.exports.getAccessToken = function getAccessToken (req, res, next) {
   User.getAccessToken(req.swagger.params, res, next);
 };
 
+module.exports.getShopDataByShopName = function getShopDataByShopName (req, res, next) {
+  User.getShopDataByShopName(req.swagger.params, res, next);
+};
+
 
 module.exports = routes;
