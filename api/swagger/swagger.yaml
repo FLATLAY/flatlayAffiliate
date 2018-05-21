@@ -17,6 +17,11 @@ tags:
   externalDocs:
     description: "Find out more about our store"
     url: "http://swagger.io"
+- name: "shopify"
+  description: "Shopify related apis"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
 # 
 schemes:
   # tip: remove http to make production-grade
@@ -55,6 +60,81 @@ paths:
           description: "Internal server error"
         default:
           description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /updateMerchant:
+    post:
+      tags:
+      - "merchant"
+      summary: "Merchant sign up"
+      description: "Sign up page for Merchant"
+      operationId: "updateMerchant"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Update merchant object"
+        required: true
+        schema:
+          $ref: "#/definitions/Merchant"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /connectAccount/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Connect merchant account by shop name"
+      description: "Connect merchant account by shop name"
+      operationId: "connectAccount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to connect account"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /disconnectAccount/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Disconnect merchant account by shop name"
+      description: "Disconnect merchant account by shop name"
+      operationId: "disconnectAccount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to disconnect account"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
       x-swagger-router-controller: "UserService"
   /categories:
     post:
@@ -183,7 +263,7 @@ paths:
   /generateAccessToken/{SHOP}:
     get:
       tags:
-      - "merchant"
+      - "shopify"
       summary: "Get authorization and generate new Accesstoken"
       description: "Get authorization and generate new Accesstoken"
       operationId: "generateAccessToken"
@@ -207,7 +287,7 @@ paths:
   /getAccessToken/{SHOP}:
     get:
       tags:
-      - "merchant"
+      - "shopify"
       summary: "Get generated accesstoken"
       description: "Get generated accesstoken"
       operationId: "getAccessToken"
@@ -231,7 +311,7 @@ paths:
   /getShopDataByShopName/{SHOP}:
     get:
       tags:
-      - "merchant"
+      - "shopify"
       summary: "Get shop data by shop name"
       description: "Get shop data by shop name"
       operationId: "getShopDataByShopName"
@@ -251,6 +331,28 @@ paths:
           description: "Invalid shop name"
         404:
           description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /productListCount/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get product list count by shop name"
+      description: "Get product list count by shop name"
+      operationId: "productListCount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list count"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
       x-swagger-router-controller: "UserService"
   /swagger:
     x-swagger-pipe: swagger_raw

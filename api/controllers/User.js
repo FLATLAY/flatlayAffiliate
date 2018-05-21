@@ -17,6 +17,18 @@ module.exports.createMerchant = function createMerchant (req, res, next) {
   User.createMerchant(req.swagger.params, res, next);
 };
 
+module.exports.updateMerchant = function updateMerchant (req, res, next) {
+  User.updateMerchant(req.swagger.params, res, next);
+};
+
+module.exports.connectAccount = function connectAccount (req, res, next) {
+  User.connectAccount(req.swagger.params, res, next);
+};
+
+module.exports.disconnectAccount = function disconnectAccount (req, res, next) {
+  User.disconnectAccount(req.swagger.params, res, next);
+};
+
 module.exports.getCategories = function getCategories (req, res, next) {
   User.getCategories(req.swagger.params, res, next);
 };
@@ -51,6 +63,10 @@ module.exports.getAccessToken = function getAccessToken (req, res, next) {
 
 module.exports.getShopDataByShopName = function getShopDataByShopName (req, res, next) {
   User.getShopDataByShopName(req.swagger.params, res, next);
+};
+
+module.exports.productListCount = function productListCount (req, res, next) {
+  User.productListCount(req.swagger.params, res, next);
 };
 
 
