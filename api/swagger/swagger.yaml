@@ -136,6 +136,61 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /selectedPlan/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Selected Plan of merchant account by shop name"
+      description: "Selected Plan of merchant account by shop name"
+      operationId: "selectedPlan"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to get selected plan"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /changePlan:
+    post:
+      tags:
+      - "merchant"
+      summary: "Change plan of merchant account"
+      description: "Change plan of merchant account"
+      operationId: "changePlan"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Update merchant Plan"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            shopName:
+              type: "string"
+            planID:
+              type: "integer"
+              format: "int32"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name OR Given plan not exist"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
   /categories:
     post:
       tags:
@@ -383,18 +438,6 @@ paths:
 
 # complex objects have schema definitions
 definitions:
-  HelloWorldResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
-  ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
   Merchant:
     type: "object"
     properties:
@@ -441,16 +484,6 @@ definitions:
         format: "int32"
     xml:
       name: "User"
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
   Category:
     type: array
     items:

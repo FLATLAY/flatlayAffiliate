@@ -73,5 +73,13 @@ module.exports.productUnpubListCount = function productUnpubListCount (req, res,
   User.productUnpubListCount(req.swagger.params, res, next);
 };
 
+module.exports.selectedPlan = function selectedPlan (req, res, next) {
+  User.selectedPlan(req.swagger.params, res, next);
+};
+
+module.exports.changePlan = function changePlan (req, res, next) {
+  User.changePlan(req.swagger.params, res, next);
+};
+
 
 module.exports = routes;

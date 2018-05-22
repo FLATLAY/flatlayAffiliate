@@ -79,6 +79,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   app.use(express.static(__dirname + '/public'));
   
+  app.get('/webhook', (req, res) => {
+    res.status(200).send(JSON.stringify(res));
+  });
+
   app.get('/shopify', (req, res) => {
     // EX. shop will be ipsteststore here
     const shop = req.query.shop;
@@ -99,6 +103,8 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       return res.status(400).send('Missing shop parameter. Please add ?shop=your-development-shop.myshopify.com to your request');
     }
   });
+
+
 
   app.get('/shopify/callback', (req, res) => {
     // EX. shop will be ipsteststore.myshopify.com here
@@ -155,29 +161,45 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
         };
         var shopName = shop.replace('.myshopify.com','');
         var shopName = shopName,
-         createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-        connection.query('INSERT INTO tbl_merchant (ShopName, Code, AccessToken, CreateDate )\
-           VALUES (?,?,?,?)',
-           [shopName, code, accessToken, createDate],
-          function(err,result){
-            if(!err){
-              if(result.affectedRows != 0){
-                var insertMerchantID = result.insertId;
-                console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
-                return res.status(200).send('Accesstoken: '+accessToken);
-              }else{
-                return res.status(200).send('Query is correct but some thing is wrong with network');
-              }
-            }else{
-              console.log("err", err);
-              console.log("errresult", result);
-              return res.status(400).send(err);
-            }
-          });
+        updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+        createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
 
-        
-        
-        
+        connection.query('SELECT * from tbl_merchant where ShopName = ?', shopName, function(err,result,fields){
+          if(!err && result.length > 0){
+              var insertMerchantID = result.insertId;
+              connection.query('UPDATE tbl_merchant SET Code = ?,AccessToken = ?,UpdateDate = ? WHERE ShopName = ?',
+               [code, accessToken, updateDate,shopName],
+              function(err,result){
+                if(!err){
+                    console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                    return res.status(200).send('Accesstoken: '+accessToken);
+                }else{
+                  console.log("err", err);
+                  console.log("errresult", result);
+                  return res.status(400).send(err);
+                }
+              });
+          }else{
+            connection.query('INSERT INTO tbl_merchant (ShopName, Code, AccessToken, CreateDate )\
+             VALUES (?,?,?,?)',
+             [shopName, code, accessToken, createDate],
+            function(err,result){
+              if(!err){
+                if(result.affectedRows != 0){
+                  var insertMerchantID = result.insertId;
+                  console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                  return res.status(200).send('Accesstoken: '+accessToken);
+                }else{
+                  return res.status(200).send('Query is correct but some thing is wrong with network');
+                }
+              }else{
+                console.log("err", err);
+                console.log("errresult", result);
+                return res.status(400).send(err);
+              }
+            });
+          }
+        });
       })
       .catch((error) => {
         res.status(error.statusCode).send(error.error.error_description);

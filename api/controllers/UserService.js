@@ -616,3 +616,61 @@ exports.productUnpubListCount = function(args, res1, next){
     console.error(e);
   });
 }
+
+exports.selectedPlan = function(args, res, next){
+  var response = {};
+  var shop = /[^/]*$/.exec(args.url)[0];
+
+  connection.query('SELECT * from tbl_merchant where ShopName = ? AND AccountConnection = 1', shop, function(err,result,fields){
+    if(!err && result.length > 0){
+        response.result = 'success';
+        response.data = {'planID':result[0].PlanID};
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(200).send(JSON.stringify(response));
+    }else{
+      response.result = 'error';
+      response.data = 'Shop not found or Invalid shop name';
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).send(JSON.stringify(response));
+    }
+  });
+}
+
+exports.changePlan = function(args, res, next){
+  var response = {};
+  var shopName = args.body.shopName,
+  planID = args.body.planID,
+  updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+  // Get plans from plan table and check if provided plan id exist
+  // If exist then update
+  // Else display error
+  connection.query('SELECT * from tbl_plan where PlanID = ?', planID, function(err,result,fields){
+    if(!err && result.length > 0){
+      console.log(this.sql);
+        connection.query('UPDATE tbl_merchant SET PlanID = ?,UpdateDate = ? WHERE ShopName = ?', 
+        [planID,updateDate,shopName],
+          function(err,result){
+            if(!err && result.affectedRows > 0){
+              response.result = 'success';
+              response.msg = 'Plan updated successfully';
+              res.setHeader('Content-Type', 'application/json');
+              return res.status(200).send(JSON.stringify(response));
+            }else{
+              console.log("err", err);
+              console.log("errresult", result);
+              response.result = 'error';
+              response.msg = 'Shop not found';
+              return res.status(400).send(JSON.stringify(response) + err);
+            }
+        });
+    }else{
+      response.result = 'error';
+      response.data = 'Plan not exist';
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).send(JSON.stringify(response));
+    }
+  });
+}
