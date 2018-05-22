@@ -555,6 +555,40 @@ exports.getShopDataByShopName = function(args, res, next) {
 
 exports.productListCount = function(args, res1, next){
   var response = {};
+  // GET to token page then make call to http://127.0.0.1:10010/getAccessToken/
+  //put token into request to shopify and return object 
+  var shop = /[^/]*$/.exec(args.url)[0];
+  var response = {};
+
+  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+    shop = shop+'.myshopify.com';
+    res2.on('data', function (chunk) {
+      var chunkObj = JSON.parse(chunk);
+      if(chunkObj.result == 'success'){
+        console.log(chunkObj.accessToken);
+        const shopRequestUrl = 'https://' + shop + '/admin/products/count.json?published_status=published';
+        const shopRequestHeaders = {
+          'X-Shopify-Access-Token': chunkObj.accessToken,
+        };
+        request.get(shopRequestUrl, { headers: shopRequestHeaders })
+        .then((shopResponse) => {
+          res1.status(200).end(shopResponse);
+        })
+        .catch((error) => {
+          res1.status(error.statusCode).send(error.error.error_description);
+        });
+      }else{
+          res1.status(400).send(chunkObj.msg);
+      }
+    });
+
+  }).on('error', function(e) {
+    console.error(e);
+  });
+}
+
+exports.productUnpubListCount = function(args, res1, next){
+  var response = {};
   // GET to token page then make call to v1.flat-lay.com/externaltoken
   //put token into request to shopify and return object 
   var shop = /[^/]*$/.exec(args.url)[0];
@@ -565,7 +599,7 @@ exports.productListCount = function(args, res1, next){
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
       console.log(chunkObj.accessToken);
-      const shopRequestUrl = 'https://' + shop + '/admin/products/count.json';
+      const shopRequestUrl = 'https://' + shop + '/admin/products/count.json?published_status=unpublished';
       const shopRequestHeaders = {
         'X-Shopify-Access-Token': chunkObj.accessToken,
       };

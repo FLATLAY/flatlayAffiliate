@@ -336,9 +336,31 @@ paths:
     get:
       tags:
       - "shopify"
-      summary: "Get product list count by shop name"
-      description: "Get product list count by shop name"
+      summary: "Get published product list count by shop name"
+      description: "Get published product list count by shop name"
       operationId: "productListCount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list count"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /productUnpubListCount/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get Unpublished product list count by shop name"
+      description: "Get Unpublished product list count by shop name"
+      operationId: "productUnpubListCount"
       produces:
       - "application/xml"
       - "application/json"

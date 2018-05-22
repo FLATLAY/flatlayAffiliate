@@ -69,5 +69,9 @@ module.exports.productListCount = function productListCount (req, res, next) {
   User.productListCount(req.swagger.params, res, next);
 };
 
+module.exports.productUnpubListCount = function productUnpubListCount (req, res, next) {
+  User.productUnpubListCount(req.swagger.params, res, next);
+};
+
 
 module.exports = routes;
