@@ -180,7 +180,13 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
         .then((shopResponse) => {
           var shopResponse = JSON.parse(shopResponse);
           shopResponse = shopResponse.shop;
-          connection.query('INSERT INTO `tbl_merchant_shop` (`ID`, `Name`, `Email`, `Domain`, `Province`, `Country`, `Address1`, `Zip`, `City`, `Source`, `Phone`, `Latitude`, `Longitude`, `PrimaryLocale`, `Address2`, `CreatedAt`, `UpdatedAt`, `CountryCode`, `CountryName`, `Currency`, `CustomerEmail`, `ShopOwner`, `PlanName`, `MyshopifyDomain`)\
+          var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+shopResponse.id;
+          connection.query(sql, function (err, result) {
+            console.log(this.sql);
+            if (err) throw err;
+            console.log("Number of records deleted: " + result.affectedRows);
+          });
+          connection.query('INSERT INTO `tbl_merchant_shop` (`ShopID`, `Name`, `Email`, `Domain`, `Province`, `Country`, `Address1`, `Zip`, `City`, `Source`, `Phone`, `Latitude`, `Longitude`, `PrimaryLocale`, `Address2`, `CreatedAt`, `UpdatedAt`, `CountryCode`, `CountryName`, `Currency`, `CustomerEmail`, `ShopOwner`, `PlanName`, `MyshopifyDomain`)\
              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [shopResponse.id,shopResponse.name,shopResponse.email,shopResponse.domain,shopResponse.province,shopResponse.country,shopResponse.address1,shopResponse.zip,shopResponse.city,shopResponse.source,shopResponse.phone,shopResponse.latitude,shopResponse.longitude,shopResponse.primary_locale,shopResponse.address2,shopResponse.created_at,shopResponse.updated_at,shopResponse.country_code,shopResponse.country_name,shopResponse.currency,shopResponse.customer_email,shopResponse.shop_owner,shopResponse.plan_name,shopResponse.myshopify_domain],
             function(err,result){
               if(!err){
