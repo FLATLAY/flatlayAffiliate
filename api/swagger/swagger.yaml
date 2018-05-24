@@ -192,7 +192,7 @@ paths:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
   /categories:
-    post:
+    get:
       tags:
       - "general"
       summary: "Get list of categories"
@@ -212,7 +212,7 @@ paths:
           description: "successful operation"
       x-swagger-router-controller: "UserService"
   /products:
-    post:
+    get:
       tags:
       - "general"
       summary: "Get list of products"
@@ -232,7 +232,7 @@ paths:
           description: "successful operation"
       x-swagger-router-controller: "UserService"
   /priceSegment:
-    post:
+    get:
       tags:
       - "general"
       summary: "Get list of price segment"
@@ -252,7 +252,7 @@ paths:
           description: "successful operation"
       x-swagger-router-controller: "UserService"
   /getPlans:
-    post:
+    get:
       tags:
       - "general"
       summary: "Get list of Plans"
@@ -272,7 +272,7 @@ paths:
           description: "successful operation"
       x-swagger-router-controller: "UserService"
   /getCountry:
-    post:
+    get:
       tags:
       - "general"
       summary: "Get list of country"
@@ -387,6 +387,28 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /productList/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get product list count by shop name"
+      description: "Get product list count by shop name"
+      operationId: "productList"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name or access token"
+      x-swagger-router-controller: "UserService"
   /productListCount/{SHOP}:
     get:
       tags:
@@ -416,6 +438,28 @@ paths:
       summary: "Get Unpublished product list count by shop name"
       description: "Get Unpublished product list count by shop name"
       operationId: "productUnpubListCount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list count"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /appUninstallWebhook/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get published product list count by shop name"
+      description: "Get published product list count by shop name"
+      operationId: "appUninstallWebhook"
       produces:
       - "application/xml"
       - "application/json"

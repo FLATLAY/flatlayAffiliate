@@ -65,6 +65,14 @@ module.exports.getShopDataByShopName = function getShopDataByShopName (req, res,
   User.getShopDataByShopName(req.swagger.params, res, next);
 };
 
+module.exports.addProduct = function addProduct (req, res, next) {
+  User.addProduct(req.swagger.params, res, next);
+};
+
+module.exports.productList = function productList (req, res, next) {
+  User.productList(req.swagger.params, res, next);
+};
+
 module.exports.productListCount = function productListCount (req, res, next) {
   User.productListCount(req.swagger.params, res, next);
 };
@@ -79,6 +87,10 @@ module.exports.selectedPlan = function selectedPlan (req, res, next) {
 
 module.exports.changePlan = function changePlan (req, res, next) {
   User.changePlan(req.swagger.params, res, next);
+};
+
+module.exports.appUninstallWebhook = function appUninstallWebhook (req, res, next) {
+  User.appUninstallWebhook(req.swagger.params, res, next);
 };
 
 

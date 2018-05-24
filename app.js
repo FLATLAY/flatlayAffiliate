@@ -3,7 +3,7 @@
 var fs = require('fs'),
     path = require('path'),
     http     = require('http'),
-   	express  = require('express'),
+    express  = require('express'),
     mysql    = require('mysql'),
     parser   = require('body-parser');
 var reload = require('reload');
@@ -79,8 +79,24 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   app.use(express.static(__dirname + '/public'));
   
-  app.get('/webhook', (req, res) => {
-    res.status(200).send(JSON.stringify(res));
+  app.post('/webhook', (error, request) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log('Yah we got a webhook');
+    console.log(request.body);
+    return res.status(200).send(request.body);
+  });
+
+  app.post('/webhook/removeSaleschannel', (error, request) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    console.log('Yah we got a webhook In progress');
+    console.log(request.body);
+    return res.status(200).send(request.body);
   });
 
   app.get('/shopify', (req, res) => {
@@ -103,8 +119,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       return res.status(400).send('Missing shop parameter. Please add ?shop=your-development-shop.myshopify.com to your request');
     }
   });
-
-
 
   app.get('/shopify/callback', (req, res) => {
     // EX. shop will be ipsteststore.myshopify.com here
@@ -152,53 +166,72 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
       request.post(accessTokenRequestUrl, { json: accessTokenPayload })
       .then((accessTokenResponse) => {
-        
+        var shopData = {};
         const accessToken = accessTokenResponse.access_token;
+        //Store shop data in tbl_shop
         // DONE: Use access token to make API call to 'shop' endpoint
         const shopRequestUrl = 'https://' + shop + '/admin/shop.json';
         const shopRequestHeaders = {
+          'Content-Type':'application/json',
           'X-Shopify-Access-Token': accessToken,
         };
-        var shopName = shop.replace('.myshopify.com','');
-        var shopName = shopName,
-        updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
-        createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
 
-        connection.query('SELECT * from tbl_merchant where ShopName = ?', shopName, function(err,result,fields){
-          if(!err && result.length > 0){
-              var insertMerchantID = result.insertId;
-              connection.query('UPDATE tbl_merchant SET Code = ?,AccessToken = ?,UpdateDate = ? WHERE ShopName = ?',
-               [code, accessToken, updateDate,shopName],
-              function(err,result){
-                if(!err){
-                    console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
-                    return res.status(200).send('Accesstoken: '+accessToken);
-                }else{
-                  console.log("err", err);
-                  console.log("errresult", result);
-                  return res.status(400).send(err);
-                }
-              });
-          }else{
-            connection.query('INSERT INTO tbl_merchant (ShopName, Code, AccessToken, CreateDate )\
-             VALUES (?,?,?,?)',
-             [shopName, code, accessToken, createDate],
+        request.get(shopRequestUrl, { headers: shopRequestHeaders })
+        .then((shopResponse) => {
+          var shopResponse = JSON.parse(shopResponse);
+          shopResponse = shopResponse.shop;
+          connection.query('INSERT INTO `tbl_merchant_shop` (`ID`, `Name`, `Email`, `Domain`, `Province`, `Country`, `Address1`, `Zip`, `City`, `Source`, `Phone`, `Latitude`, `Longitude`, `PrimaryLocale`, `Address2`, `CreatedAt`, `UpdatedAt`, `CountryCode`, `CountryName`, `Currency`, `CustomerEmail`, `ShopOwner`, `PlanName`, `MyshopifyDomain`)\
+             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', [shopResponse.id,shopResponse.name,shopResponse.email,shopResponse.domain,shopResponse.province,shopResponse.country,shopResponse.address1,shopResponse.zip,shopResponse.city,shopResponse.source,shopResponse.phone,shopResponse.latitude,shopResponse.longitude,shopResponse.primary_locale,shopResponse.address2,shopResponse.created_at,shopResponse.updated_at,shopResponse.country_code,shopResponse.country_name,shopResponse.currency,shopResponse.customer_email,shopResponse.shop_owner,shopResponse.plan_name,shopResponse.myshopify_domain],
             function(err,result){
               if(!err){
-                if(result.affectedRows != 0){
-                  var insertMerchantID = result.insertId;
-                  console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
-                  return res.status(200).send('Accesstoken: '+accessToken);
+              var shopName = shop.replace('.myshopify.com','');
+              var shopName = shopName,
+              updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss'),
+              createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+              let insertMerchantID;
+              connection.query('SELECT * from tbl_merchant where ShopName = ?', shopName, function(err,result,fields){
+                if(!err && result.length > 0){
+                    insertMerchantID = result.insertId;
+                    connection.query('UPDATE tbl_merchant SET ShopID =?,Code = ?,AccessToken = ?,UpdateDate = ? WHERE ShopName = ?',
+                     [shopResponse.id,code, accessToken, updateDate,shopName],
+                    function(err,result){
+                      if(!err){
+                          console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                          return res.status(200).send('Accesstoken: '+accessToken);
+                      }else{
+                        console.log("err", err);
+                        console.log("errresult", result);
+                        return res.status(400).send(err);
+                      }
+                    });
                 }else{
-                  return res.status(200).send('Query is correct but some thing is wrong with network');
+                  connection.query('INSERT INTO tbl_merchant (ShopID, ShopName, Code, AccessToken, CreateDate )\
+                   VALUES (?,?,?,?)',
+                   [shopResponse.id, shopName, code, accessToken, createDate],
+                  function(err,result){
+                    if(!err){
+                      if(result.affectedRows != 0){
+                        insertMerchantID = result.MerchantID;
+                        console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                        return res.status(200).send('Accesstoken: '+accessToken);
+                      }else{
+                        return res.status(200).send('Query is correct but some thing is wrong with network');
+                      }
+                    }else{
+                      console.log("err", err);
+                      console.log("errresult", result);
+                      return res.status(400).send(err);
+                    }
+                  });
                 }
+              });
               }else{
                 console.log("err", err);
-                console.log("errresult", result);
-                return res.status(400).send(err);
               }
             });
-          }
+        })
+        .catch((error) => {
+          console.log(error);
         });
       })
       .catch((error) => {
@@ -209,12 +242,13 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       res.status(400).send('Required parameters missing');
     }
   });
-    
+ 
+
   reload(app);
 
   // Create server
   http.createServer(app).listen(app.get('port'), function(){
-  	console.log('Server listening on port ' + app.get('port'));
+    console.log('Server listening on port ' + app.get('port'));
   });
 
 

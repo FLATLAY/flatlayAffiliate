@@ -9,7 +9,6 @@ var http     = require('http'),
     nodemailer = require('nodemailer'),
     https   = require('https'),
     request = require('request-promise');
-
 const config = require('../../config.js');
 var async = require('async');
 var app = express();
@@ -383,7 +382,6 @@ exports.getPriceSegment = function(args, res, next) {
 
        if(result.length !=0){
          response = {'result' : 'success', 'data' : result};
-         console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -408,13 +406,8 @@ exports.getPlans = function(args, res, next) {
    var response = {};
    connection.query('SELECT * from  tbl_plan', function(err,result,fields){
      if(!err){
-
-       console.log("What is result.length??")
-       console.log(result.length);
-
        if(result.length !=0){
          response = {'result' : 'success', 'data' : result};
-         console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -487,7 +480,9 @@ exports.getStateByCountry = function(args, res, next) {
   });
 
 }
+/** END Front end APIs **/
 
+/** Shopify API starts from here **/
 exports.generateAccessToken = function(args, res, next) {
  
   var response = {};
@@ -551,6 +546,246 @@ exports.getShopDataByShopName = function(args, res, next) {
     }
   });
 
+}
+ var storedProductIDs = [];
+
+
+/* List All products from for specific shop from shopify */
+exports.productList = function(args, res, next){
+
+  var response = {};
+  // GET to token page then make call to v1.flat-lay.com/externaltoken
+  //put token into request to shopify and return object 
+  var shop = /[^/]*$/.exec(args.url)[0];
+  var response = {};
+  var shopName = shop;
+  var productIDs = [];
+  /* check exsiting products */
+  connection.query('SELECT ProductID from tbl_shop_products WHERE ShopName = ?',shopName,
+     function(err,result){
+
+      if(!err && result.length > 0){
+      //console.log(result);
+        storedProductIDs =  result;
+         //console.log(storedProductIDs);
+        http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+
+          shop = shop+'.myshopify.com';
+          res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            if(chunkObj.result == 'success'){
+              const productRequestUrl = 'https://' + shop + '/admin/products.json?published_status=published';
+              const productRequestHeaders = {
+                'X-Shopify-Access-Token': chunkObj.accessToken,
+              };
+              request.get(productRequestUrl, { headers: productRequestHeaders })
+              .then((productResponse) => {
+                var productList = productResponse;
+                var productResponse = JSON.parse(productResponse);
+
+                var robotsInDisguise = storedProductIDs.map(function(storedProductIDs){
+                    productIDs.push(storedProductIDs.ProductID);
+                }); 
+                for (var i=0; i < productResponse.products.length; i++) {
+                  if(productIDs.indexOf(productResponse.products[i].id) == -1){
+                    console.log(productIDs.indexOf(productResponse.products[i].id));
+                    storeProductData(shopName,productResponse.products[i]);
+                    storeProductVariants(productResponse.products[i].id,productResponse.products[i].variants);
+                    storeProductOptions(productResponse.products[i].id,productResponse.products[i].options);
+                    storeProductImages(productResponse.products[i].id,productResponse.products[i].images);
+                  }
+                }
+                
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).end(productList);
+              })
+              .catch((productRequestError) => {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(400).send(productRequestError);
+              });
+            }else{
+              res.status(400).send(chunkObj.msg);
+            }
+          });
+        }).on('error', function(e) {
+            console.error(e);
+        });
+
+        
+      }else{
+        http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+
+          shop = shop+'.myshopify.com';
+          res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            if(chunkObj.result == 'success'){
+              const productRequestUrl = 'https://' + shop + '/admin/products.json?published_status=published';
+              const productRequestHeaders = {
+                'X-Shopify-Access-Token': chunkObj.accessToken,
+              };
+              request.get(productRequestUrl, { headers: productRequestHeaders })
+              .then((productResponse) => {
+                var productList = productResponse;
+                var productResponse = JSON.parse(productResponse);
+
+                for (var i=0; i < productResponse.products.length; i++) {
+                    storeProductData(shopName,productResponse.products[i]);
+                    storeProductVariants(productResponse.products[i].id,productResponse.products[i].variants);
+                    storeProductOptions(productResponse.products[i].id,productResponse.products[i].options);
+                    storeProductImages(productResponse.products[i].id,productResponse.products[i].images);
+                }
+                
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).end(productList);
+              })
+              .catch((productRequestError) => {
+                res.setHeader('Content-Type', 'application/json');
+                res.status(400).send(productRequestError);
+              });
+            }else{
+              res.status(400).send(chunkObj.msg);
+            }
+          });
+        }).on('error', function(e) {
+            console.error(e);
+        });
+      }
+    });
+  /* check exsiting products */
+  
+ 
+  
+}
+
+function checkProductExist(shopName){
+  var response = [];
+   connection.query('SELECT ProductID from tbl_shop_products WHERE ShopName = ?',shopName,
+     function(err,result){
+     if(!err && result.length > 0){
+        return result;
+      }else{
+        console.log(err);
+      }
+    });
+  console.log(response);
+}
+
+function handleResultset(err, result){
+  
+  
+}
+
+function storeProductData(shopName,productResponse){
+  
+  var productvalues = [productResponse.id,shopName,productResponse.title,productResponse.body_html,productResponse.vendor,productResponse.product_type,productResponse.template_suffix,productResponse.handle,productResponse.tags,productResponse.created_at,productResponse.updated_at,productResponse.published_at];
+  
+  connection.query('INSERT INTO tbl_shop_products (ProductID,ShopName,ProductTitle,ProductBodyHtml,ProductVendor,ProductType,ProductTemplate,ProductHandle,ProductTag,ProductScope,CreatedAt,UpdateAt,PublishedAt)\
+      VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [productResponse.id,shopName,productResponse.title,productResponse.body_html,productResponse.vendor,productResponse.product_type,productResponse.template_suffix,productResponse.handle,productResponse.tags,productResponse.published_scope,productResponse.created_at,productResponse.updated_at,productResponse.published_at],
+     function(err,result){
+       if(!err){
+          console.log('storeProductData successfully');
+       }else{
+        if(err.errno==1062){
+          console.log('Its duplicate entry productID -> '+productResponse.id);
+        }
+       }
+  });
+
+  
+}
+
+function storeProductVariants(productID,productVariants){
+  for (var i=0; i < productVariants.length; i++) {
+    
+    connection.query('INSERT INTO tbl_shop_products_variants (ProductID,VariantID,VariantTitle,VariantPrice,VariantSKU,VariantPosition,VariantPolicy,VariantComparePrice,VariantFulfilmentService,VariantInventoryManagement,VariantOption1,VariantOption2,VariantOption3,VariantTaxable,VariantBarcode,VariantGrams,VariantImageID,VariantQuantity,VariantWeight,VariantWeightUnit,VariantInventoryItemID,VariantOldInventoryQty,VariantRequireShipping,CreatedAt,UpdatedAt )\
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [productID,
+        productVariants[i].id,
+        productVariants[i].title,
+        productVariants[i].price,
+        productVariants[i].sku,
+        productVariants[i].position,
+        productVariants[i].inventory_policy,
+        productVariants[i].compare_at_price,
+        productVariants[i].fulfillment_service,
+        productVariants[i].inventory_management,
+        productVariants[i].option1,
+        productVariants[i].option2,
+        productVariants[i].option3,
+        productVariants[i].taxable,
+        productVariants[i].barcode,
+        productVariants[i].grams,
+        productVariants[i].image_id,
+        productVariants[i].inventory_quantity,
+        productVariants[i].weight,
+        productVariants[i].weight_unit,
+        productVariants[i].inventory_item_id,
+        productVariants[i].old_inventory_quantity,
+        productVariants[i].requires_shipping,
+        productVariants[i].created_at,
+        productVariants[i].updated_at,
+        ],
+       function(err,result){
+         if(!err){
+          console.log('storeProductVariants successfully');
+         }else{
+          console.log(err);
+         }
+     });
+  }
+  
+}
+
+function storeProductOptions(productID,productOptions){
+  for (var i=0; i < productOptions.length; i++) {
+    connection.query('INSERT INTO tbl_shop_products_options (ProductID,OptionID,OptionName,OptionPosition,OptionValues)\
+          VALUES (?,?,?,?,?)',
+          [productID,
+          productOptions[i].id,
+          productOptions[i].name,
+          productOptions[i].position,
+          JSON.stringify(productOptions[i].values),
+          ],
+         function(err,result){
+           if(!err){
+              console.log('storeProductOptions successfully');
+           }else{
+              console.log(err);
+           }
+    });
+  }
+}
+
+function storeProductImages(productID,productImages){
+  console.log(productImages);
+  for (var i=0; i < productImages.length; i++) {
+    connection.query('INSERT INTO tbl_shop_products_images (ImageID,ProductID,ImagePosition,ImageAlt,ImageWidth,ImageHeight,ImageSrc,ImageVariantIDs,CreatedAt,UpdatedAt)\
+        VALUES (?,?,?,?,?,?,?,?,?,?)',
+        [productImages[i].id,
+        productID,
+        productImages[i].position,
+        productImages[i].alt,
+        productImages[i].width,
+        productImages[i].height,
+        productImages[i].src,
+        JSON.stringify(productImages[i].variant_ids),
+        productImages[i].created_at,
+        productImages[i].updated_at,
+        ],
+       function(err,result){
+         if(!err){
+            console.log('storeProductImages successfully');
+         }else{
+            console.log(err);
+         }
+    });
+  }
+}
+
+exports.addProduct = function(args, res, next){
+  var response = {};
+  console.log(args.body);
 }
 
 exports.productListCount = function(args, res1, next){
@@ -672,5 +907,38 @@ exports.changePlan = function(args, res, next){
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.status(400).send(JSON.stringify(response));
     }
+  });
+}
+
+
+exports.appUninstallWebhook = function(args, res, next){
+  var response = {};
+  // GET to token page then make call to v1.flat-lay.com/externaltoken
+  //put token into request to shopify and return object 
+  var shop = /[^/]*$/.exec(args.url)[0];
+  var response = {};
+
+  http.get('http://127.0.0.1:10010/getAccessToken/ipsteststore', function(res2) {
+    shop = shop+'.myshopify.com';
+    res2.on('data', function (chunk) {
+      var chunkObj = JSON.parse(chunk);
+      console.log(chunkObj.accessToken);
+      const shopRequestUrl = 'https://ipsteststore.myshopify.com/admin/app/uninstalled';
+      const shopRequestHeaders = {
+        'X-Shopify-Access-Token': chunkObj.accessToken,
+      };
+      request.get(shopRequestUrl, { headers: shopRequestHeaders })
+      .then((shopResponse) => {
+        console.log('shopResponse'+shopResponse);
+        res.status(200).end(shopResponse);
+      })
+      .catch((error) => {
+        console.log(error);
+        res.status(error.statusCode).send(error.error.error_description);
+      });
+    });
+
+  }).on('error', function(e) {
+    console.error(e);
   });
 }
