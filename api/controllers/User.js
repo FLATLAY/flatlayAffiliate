@@ -73,6 +73,10 @@ module.exports.productList = function productList (req, res, next) {
   User.productList(req.swagger.params, res, next);
 };
 
+module.exports.productInfo = function productInfo (req, res, next) {
+  User.productInfo(req.swagger.params, res, next);
+};
+
 module.exports.productListCount = function productListCount (req, res, next) {
   User.productListCount(req.swagger.params, res, next);
 };
@@ -89,8 +93,32 @@ module.exports.changePlan = function changePlan (req, res, next) {
   User.changePlan(req.swagger.params, res, next);
 };
 
-module.exports.appUninstallWebhook = function appUninstallWebhook (req, res, next) {
-  User.appUninstallWebhook(req.swagger.params, res, next);
+module.exports.createCheckout = function createCheckout (req, res, next) {
+  User.createCheckout(req.swagger.params, res, next);
+};
+
+module.exports.updateCheckout = function updateCheckout (req, res, next) {
+  User.updateCheckout(req.swagger.params, res, next);
+};
+
+module.exports.getShippingRatesCheckout = function getShippingRatesCheckout (req, res, next) {
+  User.getShippingRatesCheckout(req.swagger.params, res, next);
+};
+
+module.exports.putShippingRatesCheckout = function putShippingRatesCheckout (req, res, next) {
+  User.putShippingRatesCheckout(req.swagger.params, res, next);
+};
+
+module.exports.createpayment = function createpayment (req, res, next) {
+  User.createpayment(req.swagger.params, res, next);
+};
+
+module.exports.getpayment = function getpayment (req, res, next) {
+  User.getpayment(req.swagger.params, res, next);
+};
+
+module.exports.addstripecard = function addstripecard (req, res, next) {
+  User.addstripecard(req.swagger.params, res, next);
 };
 
 

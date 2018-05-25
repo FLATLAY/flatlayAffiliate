@@ -27,6 +27,7 @@
       "reload": "^2.2.2",
       "request": "^2.85.0",
       "request-promise": "^4.2.2",
+      "stripe": "^6.0.0",
       "swagger-express": "^1.0.5",
       "swagger-tools": "0.10.1"
    },

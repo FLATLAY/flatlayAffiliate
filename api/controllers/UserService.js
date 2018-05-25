@@ -10,7 +10,6 @@ var http     = require('http'),
     https   = require('https'),
     request = require('request-promise');
 const config = require('../../config.js');
-var async = require('async');
 var app = express();
 
 const dotenv = require('dotenv').config();
@@ -614,7 +613,6 @@ exports.productList = function(args, res, next){
         
       }else{
         http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
-
           shop = shop+'.myshopify.com';
           res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
@@ -657,23 +655,7 @@ exports.productList = function(args, res, next){
   
 }
 
-function checkProductExist(shopName){
-  var response = [];
-   connection.query('SELECT ProductID from tbl_shop_products WHERE ShopName = ?',shopName,
-     function(err,result){
-     if(!err && result.length > 0){
-        return result;
-      }else{
-        console.log(err);
-      }
-    });
-  console.log(response);
-}
 
-function handleResultset(err, result){
-  
-  
-}
 
 function storeProductData(shopName,productResponse){
   
@@ -781,6 +763,40 @@ function storeProductImages(productID,productImages){
          }
     });
   }
+}
+
+exports.productInfo = function(args, res1, next){
+  var SHOP = args.body.shopName,
+      productID = args.body.productID;
+  var response = {};
+  http.get('http://127.0.0.1:10010/getAccessToken/'+ SHOP, function(res2) {
+    res2.on('data', function (chunk) {
+      var chunkObj = JSON.parse(chunk);
+        if(chunkObj.result == 'success'){
+          var options = {
+            url: 'https://'+ SHOP + '.myshopify.com/admin/products/'+ productID +'.json',
+            headers: {
+              'X-Shopify-Access-Token': chunkObj.accessToken
+            }
+          };
+
+          function callback(error, response, body) {
+            if (!error && response.statusCode == 200) {
+              var info = JSON.parse(body);
+              res1.setHeader('Content-Type', 'application/json');
+              res1.status(response.statusCode).send(body);
+            } else {
+              res1.status(400).send(errors);
+            }
+          }
+          request(options, callback);
+        }else{
+          res1.status(400).send(chunkObj.msg);
+        }
+    });
+  }).on('error', function(e) {
+    console.error(e);
+  });
 }
 
 exports.addProduct = function(args, res, next){
@@ -910,35 +926,345 @@ exports.changePlan = function(args, res, next){
   });
 }
 
-
-exports.appUninstallWebhook = function(args, res, next){
-  var response = {};
-  // GET to token page then make call to v1.flat-lay.com/externaltoken
-  //put token into request to shopify and return object 
-  var shop = /[^/]*$/.exec(args.url)[0];
-  var response = {};
-
-  http.get('http://127.0.0.1:10010/getAccessToken/ipsteststore', function(res2) {
-    shop = shop+'.myshopify.com';
+/* Checkout APIs */
+/* Create a checkout
+* Sample testing body request
+{ 
+  "shopName": "ipsteststore",
+  "checkout": {
+      "line_items": [
+        {
+          "variant_id": 7546388676666,
+          "quantity": 1
+        }
+      ]
+  }
+}
+*/
+exports.createCheckout = function(args, res1, next){
+  var shop = args.body.shopName,
+      checkout = args.body.checkout;
+  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
-      console.log(chunkObj.accessToken);
-      const shopRequestUrl = 'https://ipsteststore.myshopify.com/admin/app/uninstalled';
-      const shopRequestHeaders = {
-        'X-Shopify-Access-Token': chunkObj.accessToken,
+      var token = chunkObj.accessToken;
+      var options = {
+        method: 'POST',
+        url: 'https://' + shop +'.myshopify.com/admin/checkouts.json',
+        headers: 
+         {
+           'x-shopify-access-token': token,
+           'content-type': 'application/json' },
+        body: { 
+          checkout
+        },
+        json: true 
       };
-      request.get(shopRequestUrl, { headers: shopRequestHeaders })
-      .then((shopResponse) => {
-        console.log('shopResponse'+shopResponse);
-        res.status(200).end(shopResponse);
-      })
-      .catch((error) => {
-        console.log(error);
-        res.status(error.statusCode).send(error.error.error_description);
+
+      request(options, function (error, response, body) {
+        if (error) throw new Error(error);
+        res1.status(200).send(body);
       });
     });
 
   }).on('error', function(e) {
-    console.error(e);
+    res1.status(400).send(error);
   });
+
+}
+
+
+/**
+* Update checkout 
+* Sample body request for testing
+{
+  "shop": "ipsteststore",
+  "variant": 0,
+  "email": "ks@test.com",
+  "quantity": 0,
+  "checkoutTOKEN": "f72f03d43b95294a99e037d34459cd35",
+  "firstname": "K",
+  "lastname": "S",
+  "address1": "123 Main street",
+  "address2": "string",
+  "city": "string",
+  "provincecode": "GJ",
+  "countrycode": "IN",
+  "phone": "1234567891",
+  "zip": "380015"
+}
+**/
+exports.updateCheckout = function(args, res1, next){
+  var shop = args.body.shop,
+      variant_id =  args.body.variant,
+      email = args.body.email,
+      quanity = args.body.quantity,
+      checkoutTOKEN = args.body.checkoutTOKEN,
+      firstname = args.body.firstname,
+      lastname = args.body.lastname,
+      address1 = args.body.address1,
+      address2 = args.body.address2,
+      city = args.body.city,
+      provincecode = args.body.provincecode,
+      countrycode = args.body.countrycode,
+      phone = args.body.phone,
+      zip = args.body.zip;
+  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+    res2.on('data', function (chunk) {
+      var chunkObj = JSON.parse(chunk);
+      console.log(chunkObj.accessToken);
+      var options = { 
+        method: 'PUT',
+        url: 'https://' + shop +'.myshopify.com//admin/checkouts/'+ checkoutTOKEN +'.json',
+        headers: 
+         {
+           'x-shopify-access-token': chunkObj.accessToken,
+           'content-type': 'application/json' },
+        body: { 
+          checkout: { 
+            token: checkoutTOKEN,
+            email: email,
+            phone: phone,
+            shipping_address: {
+              first_name: firstname,
+              last_name: lastname,
+              address1: address1,
+              address2: address2,
+              city: city,
+              province_code: provincecode,
+              country_code: countrycode,
+              phone: phone,
+              zip: zip
+            },
+            billing_address: {
+              first_name: firstname,
+              last_name: lastname,
+              address1: address1,
+              address2: address2,
+              city: city,
+              province_code: provincecode,
+              country_code: countrycode,
+              phone: phone,
+              zip: zip
+            }
+          } 
+        },
+        json: true 
+      };
+
+      request(options, function (error, response, body) {
+        if (error) throw new Error(error);
+        console.log(body);
+        res1.status(200).send(body);
+      });
+    });
+
+  }).on('error', function(e) {
+    console.log(error);
+    res1.status(400).send(error);
+  });
+
+}
+
+/*
+* Sample data for testing
+{
+  headers: 
+   {
+     'content-type': 'application/x-www-form-urlencoded',
+     'Authorization': 'Bearer sk_test_sZRGFprzGCI5rHZ8Q1H0uFOe',
+     'client_id': 'sk_test_sZRGFprzGCI5rHZ8Q1H0uFOe'
+   },
+  form: {
+    'card[number]': '4242424242424242',
+    'card[exp_month]': '12',
+    'card[exp_year]': '2019',
+    'card[cvc]': '123'
+  }
+}
+
+*/
+exports.addstripecard = function(args, res1, next){
+
+    var stripeAccountHeader = args.body.stripeAccountHeader,
+      client_id = args.body.client_id,
+      cardNumber = args.body.cardNumber,
+      exp_month = args.body.exp_month,
+      exp_year = args.body.exp_year,
+      cvc = args.body.cvv;
+    var options = {
+      method: 'POST',
+      url: 'https://api.stripe.com/v1/tokens',
+      headers: 
+       {
+         'content-type': 'application/x-www-form-urlencoded',
+         'Authorization': 'Bearer '+client_id,
+         'client_id': client_id
+       },
+      form: {
+        'card[number]': cardNumber,
+        'card[exp_month]': exp_month,
+        'card[exp_year]': exp_year,
+        'card[cvc]': cvc
+      }
+    };
+
+    // res1.status(200).send(options);
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+      console.log(body);
+      res1.status(200).send(body);
+    });
+}
+
+/* payment api*/
+exports.getShippingRatesCheckout = function (args, res1, next) {
+    var SHOP = args.body.shop,
+            checkoutTOKEN = args.body.token;
+
+    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+        res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            var options = {
+                method: 'GET',
+                url: 'https://' + SHOP + '.myshopify.com/admin/checkouts/' + checkoutTOKEN + '/shipping_rates.json',
+                headers:
+                        {
+                            'x-shopify-access-token': chunkObj.accessToken,
+                            'content-type': 'application/json'
+                        },
+                json: true
+            };
+
+            request(options, function (error, response, body) {
+                if (error)
+                    throw new Error(error);
+                console.log(body);
+                res1.status(200).send(body);
+            });
+        });
+
+    }).on('error', function (e) {
+        console.error(e);
+        res1.status(400).send("error", error);
+    });
+
+}
+
+exports.putShippingRatesCheckout = function (args, res1, next) {
+    var SHOP = args.body.shop,
+            checkoutTOKEN = args.body.token,
+            handle = args.body.handle;
+    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+        res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            var options = {
+                method: 'PUT',
+                url: 'https://' + SHOP + '.myshopify.com/admin/checkouts/' + checkoutTOKEN + '.json',
+                headers:
+                        {
+                            'x-shopify-access-token': chunkObj.accessToken,
+                            'content-type': 'application/json'
+                        },
+                body: {
+                    checkout: {
+                        shipping_line: {
+                            handle: handle
+                        }
+                    }
+                },
+                json: true
+            };
+
+            request(options, function (error, response, body) {
+                if (error)
+                    throw new Error(error);
+                res1.status(200).send(body);
+            });
+        });
+
+    }).on('error', function (e) {
+        console.error(e);
+        res1.status(400).send("error", e);
+    });
+}
+
+exports.createpayment = function (args, res1, next) {
+    var SHOP = args.body.shop,
+            checkoutTOKEN = args.body.checkouttoken,
+            paymentToken = args.body.paymenttoken,
+            amount = args.body.amount;
+
+    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+        res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            var options = {
+                method: 'POST',
+                url: 'https://' + SHOP + '.myshopify.com/admin/checkouts/' + checkoutTOKEN + '/payments.json',
+                headers: {
+                    'X-Shopify-Access-Token': chunkObj.accessToken,
+                    'content-type': 'application/json',
+                    'X-Shopify-Checkout-Version': '2016-08-28'
+                },
+                body: {
+                    payment: {
+                        amount: amount,
+                        unique_token: "AD542A2BM-C1124",
+                        payment_token: {
+                            payment_data: paymentToken,
+                            type: "stripe_vault_token"
+                        },
+                        request_details: {
+                            ip_address: "123.1.1.1",
+                            accept_language: "en",
+                            user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36"
+                        }
+                    }
+                },
+                json: true
+            };
+
+            request(options, function (error, response, body) {
+                if (error)
+                    res1.status(400).send(response);
+                console.log(body);
+                res1.status(200).send(response);
+            });
+        });
+
+    }).on('error', function (e) {
+        console.error(e);
+        res1.status(400).send("error", error);
+    });
+}
+
+exports.getpayment = function (args, res1, next) {
+    var SHOP = args.body.shop,
+            checkoutTOKEN = args.body.checkouttoken,
+            paymentID = args.body.paymentid;
+
+    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+        res2.on('data', function (chunk) {
+            var chunkObj = JSON.parse(chunk);
+            var options = {
+                method: 'GET',
+                url: 'https://' + SHOP + '.myshopify.com/admin/checkouts/' + checkoutTOKEN + '/payments/' + paymentID + '.json',
+                headers:
+                        {
+                            'X-Shopify-Access-Token': chunkObj.accessToken,
+                            'content-type': 'application/json'
+                        },
+                json: true
+            };
+
+            request(options, function (error, response, body) {
+                if (error)
+                  res1.status(200).send(response);
+            });
+        });
+
+    }).on('error', function (e) {
+        console.error(e);
+        res1.status(400).send("error", error);
+    });
 }

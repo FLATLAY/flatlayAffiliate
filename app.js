@@ -22,7 +22,7 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 const request = require('request-promise');
-const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,read_customers,write_customers';
+const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts';
 global.HOSTNAME = process.env.HOSTNAME;
 global.APIKEY = process.env.SHOPIFY_API_KEY;
 global.APISECRET = process.env.SHOPIFY_API_SECRET;
@@ -81,11 +81,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   
   app.post('/webhook', (error, request) => {
     if (error) {
-      console.error(error);
+      //console.error(error);
       return;
     }
-    console.log('Yah we got a webhook');
-    console.log(request.body);
+    //console.log('Yah we got a webhook');
     return res.status(200).send(request.body);
   });
 
@@ -96,6 +95,17 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     }
     console.log('Yah we got a webhook In progress');
     console.log(request.body);
+    console.log(request.body.id);
+    // var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+request.body.id;
+    // connection.query(sql, function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
+    // });
+    // var sql = "DELETE FROM tbl_shop_products WHERE ShopName = "+request.body.id;
+    // connection.query(sql, function (err, result) {
+    //   if (err) throw err;
+    //   console.log("Number of records deleted: " + result.affectedRows);
+    // });
     return res.status(200).send(request.body);
   });
 
@@ -130,7 +140,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     }
     
     if (shop && hmac && code) {
-      console.log(shop);
       // DONE: Validate request is from Shopify
       const map = Object.assign({}, req.query);
       delete map['signature'];
@@ -182,7 +191,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           shopResponse = shopResponse.shop;
           var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+shopResponse.id;
           connection.query(sql, function (err, result) {
-            console.log(this.sql);
             if (err) throw err;
             console.log("Number of records deleted: " + result.affectedRows);
           });

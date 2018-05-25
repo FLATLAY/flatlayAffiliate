@@ -409,6 +409,29 @@ paths:
         400:
           description: "Invalid shop name or access token"
       x-swagger-router-controller: "UserService"
+  /productInfo:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get product information from productID"
+      description: "Get product information from productID"
+      operationId: "productInfo"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Shop name and productID to query and retrieve product detail"
+        required: true
+        schema:
+          $ref: "#/definitions/ProductInfo"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name or productID"
+      x-swagger-router-controller: "UserService"
   /productListCount/{SHOP}:
     get:
       tags:
@@ -453,27 +476,156 @@ paths:
         400:
           description: "Invalid shop name"
       x-swagger-router-controller: "UserService"
-  /appUninstallWebhook/{SHOP}:
-    get:
+  /createCheckout:
+    post:
       tags:
       - "shopify"
-      summary: "Get published product list count by shop name"
-      description: "Get published product list count by shop name"
-      operationId: "appUninstallWebhook"
+      summary: "Create a checkout"
+      description: "Create a checkout"
+      operationId: "createCheckout"
       produces:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "SHOP"
-        in: "path"
-        description: "Shop name to query and retrieve product list count"
+      - name: "body"
+        in: "body"
+        description: "Shop name and line items"
         required: true
-        type: "string"
+        schema:
+          $ref: "#/definitions/CreateCheckout"
       responses:
         200:
           description: "Successful operation"
         400:
           description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /getShippingRatesCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get shipping rates with Shop name and checkout token"
+      description: "Get shipping rates"
+      operationId: "getShippingRatesCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/completecheckout"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /putShippingRatesCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "PUT shipping rates with Shop name and checkout token and HANDLE"
+      description: "PUT shipping rates"
+      operationId: "putShippingRatesCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/putshippingratescheckout"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /updateCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "Update a checkout"
+      description: "Update a checkout"
+      operationId: "updateCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateCheckout"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /createpayment:
+    post:
+      tags:
+      - "shopify"
+      summary: "Create payment"
+      description: "Create pament with credit card id"
+      operationId: "createpayment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/createpayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /getpayment:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get payment"
+      description: "get payment info"
+      operationId: "getpayment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/getpayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"  
+  /addstripecard:
+    post:
+      tags:
+      - "shopify"
+      summary: "Tokenize cc through Stripe payment"
+      description: "Add stripe card"
+      operationId: "addstripecard"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/stripepayment"
+      responses:
+        200:
+          description: "OK"
       x-swagger-router-controller: "UserService"
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -528,6 +680,122 @@ definitions:
         format: "int32"
     xml:
       name: "User"
+  putshippingratescheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      token:
+        type: "string"
+      handle:
+        type: "string"
+  ProductInfo:
+    type: "object"
+    properties:
+      shopName:
+        type: "string"
+      productID:
+        type: "integer"
+        format: "int64"
+  CreateCheckout:
+    type: "object"
+    properties:
+      shopName:
+        type: "string"
+      checkout:
+        $ref: "#/definitions/Checkout"
+  Checkout:
+    type: "object"
+    properties:
+      line_items:
+          $ref: "#/definitions/LineItems"
+  LineItems:
+    type: array
+    items:
+      properties:
+        variant_id:
+          type: "integer"
+          format: "int64"
+        quantity:
+          type: "integer"
+          format: "int32"
+  UpdateCheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      variant:
+        type: "integer"
+        format: "int32"
+      email:
+        type: "string"
+        format: "email"
+      quantity:
+        type: "integer"
+        format: "int32"
+      checkoutTOKEN:
+        type: "string"
+      firstname:
+        type: "string"
+      lastname:
+        type: "string"
+      address1:
+        type: "string"
+      address2:
+        type: "string"
+      city:
+        type: "string"
+      provincecode:
+        type: "string"
+      countrycode:
+        type: "string"
+      phone:
+        type: "string"
+      zip:
+        type: "string"
+  createpayment:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      checkouttoken:
+        type: "string"
+      paymenttoken:
+        type: "string"
+      amount:
+        type: "string"
+  getpayment:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      checkouttoken:
+        type: "string"
+      paymentid:
+        type: "integer"
+        format: "int32"
+  completecheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      token:
+        type: "string"
+  stripepayment:
+    type: "object"
+    properties:
+      stripeAccountHeader:
+        type: "string"
+      client_id:
+        type: "string"
+      cardNumber:
+        type: "string"
+      exp_month:
+        type: "string"
+      exp_year:
+        type: "string"
+      cvv:
+        type: "string"
   Category:
     type: array
     items:
