@@ -94,18 +94,19 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       return;
     }
     console.log('Yah we got a webhook In progress');
-    console.log(request.body);
     console.log(request.body.id);
-    // var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+request.body.id;
-    // connection.query(sql, function (err, result) {
-    //   if (err) throw err;
-    //   console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
-    // });
-    // var sql = "DELETE FROM tbl_shop_products WHERE ShopName = "+request.body.id;
-    // connection.query(sql, function (err, result) {
-    //   if (err) throw err;
-    //   console.log("Number of records deleted: " + result.affectedRows);
-    // });
+    var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+request.body.id;
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
+    });
+    var shopify_domain = request.body.myshopify_domain;
+    var shopName = shopify_domain.replace('.myshopify.com','');
+    var sql = "DELETE FROM tbl_shop_products WHERE ShopName = "+shopName;
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("Number of records deleted from tbl_shop_products: " + result.affectedRows);
+    });
     return res.status(200).send(request.body);
   });
 
