@@ -95,6 +95,11 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     }
     console.log('Yah we got a webhook In progress');
     console.log(request.body.id);
+    var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+request.body.id;
+    connection.query(sql, function (err, result) {
+      if (err) throw err;
+      console.log("Number of records deleted from tbl_merchant: " + result.affectedRows);
+    });
     var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+request.body.id;
     connection.query(sql, function (err, result) {
       if (err) throw err;
@@ -107,6 +112,28 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       if (err) throw err;
       console.log("Number of records deleted from tbl_shop_products: " + result.affectedRows);
     });
+    return res.status(200).send(request.body);
+  });
+
+  app.post('/webhook/customers/redact', (error, request) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    console.log('Yah we got a webhook for customers/redact');
+    
+    return res.status(200).send(request.body);
+  });
+
+  app.post('/webhook/shop/redact', (error, request) => {
+    if (error) {
+      console.error(error);
+      return;
+    }
+    
+    console.log('Yah we got a webhook for shop/redact');
+    
     return res.status(200).send(request.body);
   });
 

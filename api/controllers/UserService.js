@@ -567,7 +567,7 @@ exports.productList = function(args, res, next){
       //console.log(result);
         storedProductIDs =  result;
          //console.log(storedProductIDs);
-        http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+        http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
 
           shop = shop+'.myshopify.com';
           res2.on('data', function (chunk) {
@@ -612,7 +612,7 @@ exports.productList = function(args, res, next){
 
         
       }else{
-        http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+        http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
           shop = shop+'.myshopify.com';
           res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
@@ -769,7 +769,7 @@ exports.productInfo = function(args, res1, next){
   var SHOP = args.body.shopName,
       productID = args.body.productID;
   var response = {};
-  http.get('http://127.0.0.1:10010/getAccessToken/'+ SHOP, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ SHOP, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
         if(chunkObj.result == 'success'){
@@ -811,7 +811,7 @@ exports.productListCount = function(args, res1, next){
   var shop = /[^/]*$/.exec(args.url)[0];
   var response = {};
 
-  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     shop = shop+'.myshopify.com';
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
@@ -845,7 +845,7 @@ exports.productUnpubListCount = function(args, res1, next){
   var shop = /[^/]*$/.exec(args.url)[0];
   var response = {};
 
-  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     shop = shop+'.myshopify.com';
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
@@ -944,7 +944,7 @@ exports.changePlan = function(args, res, next){
 exports.createCheckout = function(args, res1, next){
   var shop = args.body.shopName,
       checkout = args.body.checkout;
-  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
       var token = chunkObj.accessToken;
@@ -1009,13 +1009,13 @@ exports.updateCheckout = function(args, res1, next){
       countrycode = args.body.countrycode,
       phone = args.body.phone,
       zip = args.body.zip;
-  http.get('http://127.0.0.1:10010/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
       console.log(chunkObj.accessToken);
       var options = { 
         method: 'PUT',
-        url: 'https://' + shop +'.myshopify.com//admin/checkouts/'+ checkoutTOKEN +'.json',
+        url: 'https://' + shop +'.myshopify.com/admin/checkouts/'+ checkoutTOKEN +'.json',
         headers: 
          {
            'x-shopify-access-token': chunkObj.accessToken,
@@ -1122,7 +1122,7 @@ exports.getShippingRatesCheckout = function (args, res1, next) {
     var SHOP = args.body.shop,
             checkoutTOKEN = args.body.token;
 
-    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
@@ -1155,7 +1155,7 @@ exports.putShippingRatesCheckout = function (args, res1, next) {
     var SHOP = args.body.shop,
             checkoutTOKEN = args.body.token,
             handle = args.body.handle;
-    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
@@ -1195,7 +1195,7 @@ exports.createpayment = function (args, res1, next) {
             paymentToken = args.body.paymenttoken,
             amount = args.body.amount;
 
-    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
@@ -1243,7 +1243,7 @@ exports.getpayment = function (args, res1, next) {
             checkoutTOKEN = args.body.checkouttoken,
             paymentID = args.body.paymentid;
 
-    http.get('http://127.0.0.1:10010/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {

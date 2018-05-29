@@ -3,7 +3,7 @@ info:
   version: "0.0.1"
   title: Flatlay
 # during dev, should point to your local machine
-host: 127.0.0.1:10010
+host: affiliate.flat-lay.com
 # basePath prefixes all resource paths 
 basePath: /
 tags:
@@ -25,8 +25,8 @@ tags:
 # 
 schemes:
   # tip: remove http to make production-grade
-  - http
   - https
+  - http
 # format of bodies a client can send (Content-Type)
 consumes:
   - application/json
