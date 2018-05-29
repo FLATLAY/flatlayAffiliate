@@ -239,6 +239,40 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                     function(err,result){
                       if(!err){
                           console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                          var options = {
+                            method: 'POST',
+                            url: 'https://' + shopName + '.myshopify.com/admin/admin/webhooks.json',
+                            headers: {
+                                'Host':shop,
+                                'X-Shopify-Access-Token': accessToken,
+                                'content-type': 'application/json'
+                            },
+                            body: {
+                                webhook: [{
+                                              topic: "app/uninstalled",
+                                              address: HOSTNAME+"/webhook/removeSaleschannel",
+                                              format: "json"
+                                        },
+                                        {
+                                              topic: "products/create",
+                                              address: HOSTNAME+"/webhook",
+                                              format: "json"
+                                        },
+                                        {
+                                              topic: "products/delete",
+                                              address: HOSTNAME+"/webhook",
+                                              format: "json"
+                                        }]
+                            },
+                            json: true
+                        };
+
+                        request(options, function (error, response, body) {
+                            if (error)
+                                res1.status(400).send(response);
+                            console.log(body);
+                            res1.status(200).send(response);
+                        });
                           return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
                         console.log("err", err);
