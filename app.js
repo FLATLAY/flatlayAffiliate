@@ -269,9 +269,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
                         request(options, function (error, response, body) {
                             if (error)
-                                res1.status(400).send(response);
                             console.log(body);
-                            res1.status(200).send(response);
                         });
                           return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
