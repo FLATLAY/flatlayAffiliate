@@ -486,7 +486,7 @@ exports.generateAccessToken = function(args, res, next) {
  
   var response = {};
   // Generate access token from this url
-  var shop = /[^/]*$/.exec(args.url)[0]+'.myshopify.com';
+  var shop = /[^/]*$/.exec(args.url)[0];
   
   var url = HOSTNAME+"/shopify?shop="+shop+""; // Replace this with your HTTPS Forwarding address
   response.result = 'success';

@@ -248,7 +248,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                     });
                 }else{
                   connection.query('INSERT INTO tbl_merchant (ShopID, ShopName, Code, AccessToken, CreateDate )\
-                   VALUES (?,?,?,?)',
+                   VALUES (?,?,?,?,?)',
                    [shopResponse.id, shopName, code, accessToken, createDate],
                   function(err,result){
                     if(!err){
