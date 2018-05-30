@@ -89,17 +89,17 @@ function insertNewMerchant(data,res){
              [companyName, shopName, firstName, lastName, password, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
             function(err,result){
               if(!err){
-                  insertMerchantID = result.MerchantID;
+                  insertMerchantID = result.insertId;
                   if(category){
                     for(var i = 0; i < category.length;i++){
                       connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
-                         VALUES (?,?)',
+                         VALUES (?,?,?)',
                          [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
                         function(err,result){
                           if(!err){
-                              
+                            console.log(this.sql);
                           }else{
-                            
+                            console.log(err);
                           }
                       });
                     }
@@ -117,6 +117,7 @@ function insertNewMerchant(data,res){
 }
 
 function updateExistingMerchant(data,res){
+  
   var response = {};
   let query,insertMerchantID;
   var companyName = data.companyName,
@@ -147,32 +148,42 @@ function updateExistingMerchant(data,res){
               if(!err){
                   connection.query('SELECT * from tbl_merchant where ShopName = ?', [shopName],function(err,result,fields){
                      if(!err && result.length !=0){
-                        insertMerchantID = result.MerchantID;
+                        insertMerchantID = result[0].MerchantID;
                         if(category){
+                          connection.query("DELETE FROM tbl_merchant_category WHERE MerchantID = "+insertMerchantID, function (err, result) {
+                            if (err) throw err;
+                          });
                           for(var i = 0; i < category.length;i++){
                             connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
-                               VALUES (?,?)',
+                               VALUES (?,?,?)',
                                [insertMerchantID,category[i],moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
                               function(err,result){
                                 if(!err){
-                                    
+                                    response.result = 'success';
+                                    response.msg = 'New merchant created';
+                                    response.statusCode = 200;
+                                    res.setHeader('Content-Type', 'application/json');
+                                    return res.status(response.statusCode).send(JSON.stringify(response));
                                 }else{
-                                  
+                                    response.result = 'error';
+                                    response.error = err;
+                                    response.statusCode = 400;
+                                    res.setHeader('Content-Type', 'application/json');
+                                    return res.status(response.statusCode).send(JSON.stringify(response));
                                 }
                             });
                           }
                         }
                      }else{
+                        response.statusCode = 200;
                         response.result = 'success';
                         response.msg = 'New merchant created';
                         res.setHeader('Content-Type', 'application/json');
-                        return res.status(200).send(JSON.stringify(response));
+                        return res.status(response.statusCode).send(JSON.stringify(response));
                      }
                   });
-                  response.result = 'success';
-                  response.msg = 'New merchant created';
-                  res.setHeader('Content-Type', 'application/json');
-                  return res.status(200).send(JSON.stringify(response));
+                  
+                  
               }else{
                 console.log("err", err);
                 console.log("errresult", result);
