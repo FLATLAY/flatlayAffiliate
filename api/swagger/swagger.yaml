@@ -136,6 +136,28 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /validateCompanyName/{companyName}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Disconnect merchant account by shop name"
+      description: "Disconnect merchant account by shop name"
+      operationId: "validateCompanyName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "companyName"
+        in: "path"
+        description: "The company name which needs to validate"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid request"
+      x-swagger-router-controller: "UserService"
   /selectedPlan/{SHOP}:
     get:
       tags:
