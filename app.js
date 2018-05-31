@@ -239,29 +239,8 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                     function(err,result){
                       if(!err){
                           console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
-                          var options = {
-                            method: 'POST',
-                            url: 'https://' + shopName + '.myshopify.com/admin/webhooks.json',
-                            headers: {
-                                'Host':shop,
-                                'X-Shopify-Access-Token': accessToken,
-                                'content-type': 'application/json'
-                            },
-                            body: {
-                                webhook: {
-                                              topic: "products/create",
-                                              address: HOSTNAME+"/webhook",
-                                              format: "json"
-                                        }
-                            },
-                            json: true
-                        };
-
-                        request(options, function (error, response, body) {
+                          registerWebhooks(accessToken,shopName);
                           res.redirect(SHOPIFY_APP_URL+"?shop="+shop);
-                            if (error) throw new Error(error);
-                            console.log(body);
-                        });
                           //return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
                         console.log("err", err);
@@ -280,6 +259,8 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                         console.log(result);
                         insertMerchantID = result.insertId;
                         console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
+                        registerWebhooks(accessToken,shopName);
+                        res.redirect(SHOPIFY_APP_URL+"?shop="+shop);
                         //return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
                         return res.status(200).send('Query is correct but some thing is wrong with network');
@@ -307,6 +288,79 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
     } else {
       res.status(400).send('Required parameters missing');
+    }
+
+    function registerWebhooks(Accesstoken,shopName){
+      var options = {
+          method: 'POST',
+          url: 'https://' + shopName + '.myshopify.com/admin/webhooks.json',
+          headers: {
+              'Host':'https://' + shopName + '.myshopify.com',
+              'X-Shopify-Access-Token': Accesstoken,
+              'content-type': 'application/json'
+          },
+          body: {
+              webhook: 
+              {
+                topic: "products/create",
+                address: HOSTNAME+"/webhook",
+                format: "json"
+              }
+          },
+          json: true
+      };
+
+      request(options, function (error, response, body) {
+          if (error) throw new Error(error);
+          console.log(body);
+      });
+
+      var options = {
+          method: 'POST',
+          url: 'https://' + shopName + '.myshopify.com/admin/webhooks.json',
+          headers: {
+              'Host':'https://' + shopName + '.myshopify.com',
+              'X-Shopify-Access-Token': Accesstoken,
+              'content-type': 'application/json'
+          },
+          body: {
+              webhook: 
+              {
+                topic: "products/delete",
+                address: HOSTNAME+"/webhook",
+                format: "json"
+              }
+          },
+          json: true
+      };
+
+      request(options, function (error, response, body) {
+          if (error) throw new Error(error);
+          console.log(body);
+      });
+      var options = {
+          method: 'POST',
+          url: 'https://' + shopName + '.myshopify.com/admin/webhooks.json',
+          headers: {
+              'Host':'https://' + shopName + '.myshopify.com',
+              'X-Shopify-Access-Token': Accesstoken,
+              'content-type': 'application/json'
+          },
+          body: {
+              webhook: 
+              {
+                topic: "app/uninstalled",
+                address: HOSTNAME+"/webhook/removeSaleschannel",
+                format: "json"
+              }
+          },
+          json: true
+      };
+
+      request(options, function (error, response, body) {
+          if (error) throw new Error(error);
+          console.log(body);
+      });
     }
   });
  
