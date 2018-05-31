@@ -44,7 +44,11 @@ exports.createMerchant = function(args, res, next) {
       // check if shop already exist
       connection.query('SELECT * from tbl_merchant where ShopName = ?', shopName, function(err,result,fields){
         if(!err && result.length > 0){
-          updateExistingMerchant(args.body,res);
+           response.result = 'error';
+           response.msg = 'Shop is already exist';
+           res.setHeader('Content-Type', 'application/json');
+           return res.status(200).send(JSON.stringify(response));
+          //updateExistingMerchant(args.body,res);
         }else{
           insertNewMerchant(args.body,res);
         }
@@ -313,6 +317,36 @@ exports.disconnectAccount = function(args, res, next) {
             }
             
         });
+}
+
+exports.validateCompanyName = function(args, res, next) {
+  /*
+   * validate given company name for signup
+   * If company name is available Or alerady exist
+   *
+   * returns result with sucess / error with message
+   */
+   var response = {};
+   var companyName = /[^/]*$/.exec(args.url)[0];
+   companyName = decodeURIComponent(companyName);
+   connection.query('SELECT * from tbl_merchant where CompanyName = ?',[companyName], function(err,result,fields){
+     if(!err){
+       console.log("What is result.length??")
+       console.log(result.length);
+       if(result.length != 0){
+         response = {'result' : 'error', 'msg' : 'The Company name is already exist.'};
+         console.log(response);
+         res.setHeader('Content-Type', 'application/json');
+         res.status(200).send(JSON.stringify(response));
+       }else{
+         response = {'result' : 'success', 'msg' : 'The Comapny name is valid.'};
+         res.setHeader('Content-Type', 'application/json');
+         res.status(200).send(JSON.stringify(response));
+       }
+     } else{
+         res.status(400).send(err);
+     }
+  });
 }
 
 exports.getCategories = function(args, res, next) {

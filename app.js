@@ -26,7 +26,7 @@ const scopes = 'read_product_listings,read_products,write_products,read_orders,w
 global.HOSTNAME = process.env.HOSTNAME;
 global.APIKEY = process.env.SHOPIFY_API_KEY;
 global.APISECRET = process.env.SHOPIFY_API_SECRET;
-
+global.SHOPIFY_APP_URL = "https://client.flat-lay.com/install";
 app.use(cors());
 app.use(parser.json());
 app.use(parser.urlencoded({ extended: true }));
@@ -233,7 +233,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
               let insertMerchantID;
               connection.query('SELECT * from tbl_merchant where ShopName = ?', shopName, function(err,result,fields){
                 if(!err && result.length > 0){
-                    insertMerchantID = result.insertId;
+                    insertMerchantID = result[0].MerchantID;
                     connection.query('UPDATE tbl_merchant SET ShopID =?,Code = ?,AccessToken = ?,UpdateDate = ? WHERE ShopName = ?',
                      [shopResponse.id,code, accessToken, updateDate,shopName],
                     function(err,result){
@@ -241,37 +241,28 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                           console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
                           var options = {
                             method: 'POST',
-                            url: 'https://' + shopName + '.myshopify.com/admin/admin/webhooks.json',
+                            url: 'https://' + shopName + '.myshopify.com/admin/webhooks.json',
                             headers: {
                                 'Host':shop,
                                 'X-Shopify-Access-Token': accessToken,
                                 'content-type': 'application/json'
                             },
                             body: {
-                                webhook: [{
-                                              topic: "app/uninstalled",
-                                              address: HOSTNAME+"/webhook/removeSaleschannel",
-                                              format: "json"
-                                        },
-                                        {
+                                webhook: {
                                               topic: "products/create",
                                               address: HOSTNAME+"/webhook",
                                               format: "json"
-                                        },
-                                        {
-                                              topic: "products/delete",
-                                              address: HOSTNAME+"/webhook",
-                                              format: "json"
-                                        }]
+                                        }
                             },
                             json: true
                         };
 
                         request(options, function (error, response, body) {
-                            if (error)
+                          res.redirect(SHOPIFY_APP_URL+"?shop="+shop);
+                            if (error) throw new Error(error);
                             console.log(body);
                         });
-                          return res.status(200).send('Accesstoken: '+accessToken);
+                          //return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
                         console.log("err", err);
                         console.log("errresult", result);
@@ -284,10 +275,12 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
                    [shopResponse.id, shopName, code, accessToken, createDate],
                   function(err,result){
                     if(!err){
+
                       if(result.affectedRows != 0){
-                        insertMerchantID = result.MerchantID;
+                        console.log(result);
+                        insertMerchantID = result.insertId;
                         console.log("New merchant accesstoken inserted. MerchantID is "+insertMerchantID);
-                        return res.status(200).send('Accesstoken: '+accessToken);
+                        //return res.status(200).send('Accesstoken: '+accessToken);
                       }else{
                         return res.status(200).send('Query is correct but some thing is wrong with network');
                       }

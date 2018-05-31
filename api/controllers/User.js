@@ -29,6 +29,10 @@ module.exports.disconnectAccount = function disconnectAccount (req, res, next) {
   User.disconnectAccount(req.swagger.params, res, next);
 };
 
+module.exports.validateCompanyName = function validateCompanyName (req, res, next) {
+  User.validateCompanyName(req.swagger.params, res, next);
+};
+
 module.exports.getCategories = function getCategories (req, res, next) {
   User.getCategories(req.swagger.params, res, next);
 };
