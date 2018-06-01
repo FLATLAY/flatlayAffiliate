@@ -33,6 +33,10 @@ module.exports.validateCompanyName = function validateCompanyName (req, res, nex
   User.validateCompanyName(req.swagger.params, res, next);
 };
 
+module.exports.loginUser = function loginUser (req, res, next) {
+  User.loginUser(req.swagger.params, res, next);
+};
+
 module.exports.getCategories = function getCategories (req, res, next) {
   User.getCategories(req.swagger.params, res, next);
 };
