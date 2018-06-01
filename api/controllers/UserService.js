@@ -72,6 +72,8 @@ function insertNewMerchant(data,res){
          lastName = data.lastName,
          email = data.email,
          password = data.currentPassword,
+         commissionType = data.commissionType,
+         commissionValue = data.commissionValue,
          category = data.category,
          productID = data.productID,
          priceSegmentID = data.priceSegmentID,
@@ -86,11 +88,11 @@ function insertNewMerchant(data,res){
          planID = data.planID,
          createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
   
-  query = 'INSERT INTO tbl_merchant (CompanyName, ShopName, FirstName, LastName, Password, Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+  query = 'INSERT INTO tbl_merchant (CompanyName, ShopName, FirstName, LastName, Password,CommissionType,CommissionValue,Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
   connection.query(query,
-             [companyName, shopName, firstName, lastName, password, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
+             [companyName, shopName, firstName, lastName, password,commissionType,commissionValue, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
             function(err,result){
               if(!err){
                   insertMerchantID = result.insertId;
