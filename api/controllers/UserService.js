@@ -27,6 +27,8 @@ app.use(function(req, res, next) {
 
 });
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 exports.createMerchant = function(args, res, next) {
   /**
    * Merchant sign up
