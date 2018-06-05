@@ -1,0 +1,852 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Flatlay
+# during dev, should point to your local machine
+host: affiliate.flat-lay.com
+# basePath prefixes all resource paths 
+basePath: /
+tags:
+- name: "merchant"
+  description: "Operations about merchant"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+- name: "general"
+  description: "General operations"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+- name: "shopify"
+  description: "Shopify related apis"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - https
+  - http
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /merchant:
+    post:
+      tags:
+      - "merchant"
+      summary: "Merchant sign up"
+      description: "Sign up page for Merchant"
+      operationId: "createMerchant"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created merchant object"
+        required: true
+        schema:
+          $ref: "#/definitions/Merchant"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /updateMerchant:
+    post:
+      tags:
+      - "merchant"
+      summary: "Merchant sign up"
+      description: "Sign up page for Merchant"
+      operationId: "updateMerchant"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Update merchant object"
+        required: true
+        schema:
+          $ref: "#/definitions/Merchant"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /connectAccount/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Connect merchant account by shop name"
+      description: "Connect merchant account by shop name"
+      operationId: "connectAccount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to connect account"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /disconnectAccount/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Disconnect merchant account by shop name"
+      description: "Disconnect merchant account by shop name"
+      operationId: "disconnectAccount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to disconnect account"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /validateCompanyName/{companyName}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Disconnect merchant account by shop name"
+      description: "Disconnect merchant account by shop name"
+      operationId: "validateCompanyName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "companyName"
+        in: "path"
+        description: "The company name which needs to validate"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid request"
+      x-swagger-router-controller: "UserService"
+  /user/login:
+    get:
+      tags:
+      - "merchant"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid username/password supplied"
+      x-swagger-router-controller: "UserService"
+  /selectedPlan/{SHOP}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Selected Plan of merchant account by shop name"
+      description: "Selected Plan of merchant account by shop name"
+      operationId: "selectedPlan"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to get selected plan"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /changePlan:
+    post:
+      tags:
+      - "merchant"
+      summary: "Change plan of merchant account"
+      description: "Change plan of merchant account"
+      operationId: "changePlan"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Update merchant Plan"
+        required: true
+        schema:
+          type: "object"
+          properties:
+            shopName:
+              type: "string"
+            planID:
+              type: "integer"
+              format: "int32"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name OR Given plan not exist"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /categories:
+    get:
+      tags:
+      - "general"
+      summary: "Get list of categories"
+      description: "Get list of categories"
+      operationId: "getCategories"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /products:
+    get:
+      tags:
+      - "general"
+      summary: "Get list of products"
+      description: "Get list of products"
+      operationId: "getProducts"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /priceSegment:
+    get:
+      tags:
+      - "general"
+      summary: "Get list of price segment"
+      description: "Get list of price segment"
+      operationId: "getPriceSegment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getPlans:
+    get:
+      tags:
+      - "general"
+      summary: "Get list of Plans"
+      description: "Get list of getPlans"
+      operationId: "getPlans"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getCountry:
+    get:
+      tags:
+      - "general"
+      summary: "Get list of country"
+      description: "Get list of getCountry"
+      operationId: "getCountry"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
+  /getStateByCountry/{countryCode}:
+    get:
+      tags:
+      - "general"
+      summary: "Get states by country"
+      description: "Get states by country"
+      operationId: "getStateByCountry"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "countryCode"
+        in: "path"
+        description: "The country code that needs to be fetched."
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid country code supplied"
+        404:
+          description: "Country code not found"
+      x-swagger-router-controller: "UserService"
+  /generateAccessToken/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get authorization and generate new Accesstoken"
+      description: "Get authorization and generate new Accesstoken"
+      operationId: "generateAccessToken"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs to generate AccessToken"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /getAccessToken/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get generated accesstoken"
+      description: "Get generated accesstoken"
+      operationId: "getAccessToken"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs Accesstoken"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /getShopDataByShopName/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get shop data by shop name"
+      description: "Get shop data by shop name"
+      operationId: "getShopDataByShopName"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "The shop name for which needs Accesstoken"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+        404:
+          description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /productList/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get product list count by shop name"
+      description: "Get product list count by shop name"
+      operationId: "productList"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name or access token"
+      x-swagger-router-controller: "UserService"
+  /productInfo:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get product information from productID"
+      description: "Get product information from productID"
+      operationId: "productInfo"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Shop name and productID to query and retrieve product detail"
+        required: true
+        schema:
+          $ref: "#/definitions/ProductInfo"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name or productID"
+      x-swagger-router-controller: "UserService"
+  /productListCount/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get published product list count by shop name"
+      description: "Get published product list count by shop name"
+      operationId: "productListCount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list count"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /productUnpubListCount/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get Unpublished product list count by shop name"
+      description: "Get Unpublished product list count by shop name"
+      operationId: "productUnpubListCount"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list count"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /createCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "Create a checkout"
+      description: "Create a checkout"
+      operationId: "createCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Shop name and line items"
+        required: true
+        schema:
+          $ref: "#/definitions/CreateCheckout"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /getShippingRatesCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get shipping rates with Shop name and checkout token"
+      description: "Get shipping rates"
+      operationId: "getShippingRatesCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/completecheckout"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /putShippingRatesCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "PUT shipping rates with Shop name and checkout token and HANDLE"
+      description: "PUT shipping rates"
+      operationId: "putShippingRatesCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/putshippingratescheckout"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /updateCheckout:
+    post:
+      tags:
+      - "shopify"
+      summary: "Update a checkout"
+      description: "Update a checkout"
+      operationId: "updateCheckout"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateCheckout"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name"
+      x-swagger-router-controller: "UserService"
+  /createpayment:
+    post:
+      tags:
+      - "shopify"
+      summary: "Create payment"
+      description: "Create pament with credit card id"
+      operationId: "createpayment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/createpayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /getpayment:
+    post:
+      tags:
+      - "shopify"
+      summary: "Get payment"
+      description: "get payment info"
+      operationId: "getpayment"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/getpayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"  
+  /addstripecard:
+    post:
+      tags:
+      - "shopify"
+      summary: "Tokenize cc through Stripe payment"
+      description: "Add stripe card"
+      operationId: "addstripecard"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created object of the data"
+        required: true
+        schema:
+          $ref: "#/definitions/stripepayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+
+
+# complex objects have schema definitions
+definitions:
+  Merchant:
+    type: "object"
+    properties:
+      companyName:
+        type: "string"
+      shopName:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      currentPassword:
+        type: "string"
+      category:
+        $ref: "#/definitions/Category"
+      productID: 
+        type: "integer"
+        format: "int32"
+      priceSegmentID:
+        type: "integer"
+        format: "int32"
+      targetAudience:
+        type: "string"
+      webUrl:
+        type: "string"
+      streetAddress:
+        type: "string"
+      city:
+        type: "string"
+      zipCode:
+        type: "string"
+      countryID:
+        type: "integer"
+        format: "int32"
+      stateID:
+        type: "integer"
+        format: "int32"
+      phoneNumber:
+        type: "string"
+      planID:
+        type: "integer"
+        format: "int32"
+    xml:
+      name: "User"
+  putshippingratescheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      token:
+        type: "string"
+      handle:
+        type: "string"
+  ProductInfo:
+    type: "object"
+    properties:
+      shopName:
+        type: "string"
+      productID:
+        type: "integer"
+        format: "int64"
+  CreateCheckout:
+    type: "object"
+    properties:
+      shopName:
+        type: "string"
+      checkout:
+        $ref: "#/definitions/Checkout"
+  Checkout:
+    type: "object"
+    properties:
+      line_items:
+          $ref: "#/definitions/LineItems"
+  LineItems:
+    type: array
+    items:
+      properties:
+        variant_id:
+          type: "integer"
+          format: "int64"
+        quantity:
+          type: "integer"
+          format: "int32"
+  UpdateCheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      variant:
+        type: "integer"
+        format: "int32"
+      email:
+        type: "string"
+        format: "email"
+      quantity:
+        type: "integer"
+        format: "int32"
+      checkoutTOKEN:
+        type: "string"
+      firstname:
+        type: "string"
+      lastname:
+        type: "string"
+      address1:
+        type: "string"
+      address2:
+        type: "string"
+      city:
+        type: "string"
+      provincecode:
+        type: "string"
+      countrycode:
+        type: "string"
+      phone:
+        type: "string"
+      zip:
+        type: "string"
+  createpayment:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      checkouttoken:
+        type: "string"
+      paymenttoken:
+        type: "string"
+      amount:
+        type: "string"
+  getpayment:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      checkouttoken:
+        type: "string"
+      paymentid:
+        type: "integer"
+        format: "int32"
+  completecheckout:
+    type: "object"
+    properties:
+      shop:
+        type: "string"
+      token:
+        type: "string"
+  stripepayment:
+    type: "object"
+    properties:
+      stripeAccountHeader:
+        type: "string"
+      client_id:
+        type: "string"
+      cardNumber:
+        type: "string"
+      exp_month:
+        type: "string"
+      exp_year:
+        type: "string"
+      cvv:
+        type: "string"
+  Category:
+    type: array
+    items:
+      type: integer
+  
