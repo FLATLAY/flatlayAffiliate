@@ -369,7 +369,7 @@ exports.loginUser = function(args, res, next) {
 
     if (username !== 'undefined' && password !== 'undefined') {
 
-        connection.query('SELECT MerchantID, Email FROM tbl_merchant WHERE companyName=? AND password=?', [username, password], function (err, result) {
+        connection.query('SELECT MerchantID, Email,ShopName FROM tbl_merchant WHERE companyName=? AND password=?', [username, password], function (err, result) {
             if (!err) {
                 if (result.length <= 0) {
                     res.setHeader('Content-Type', 'application/json');
@@ -377,7 +377,7 @@ exports.loginUser = function(args, res, next) {
 
                 } else {
                     res.setHeader('Content-Type', 'application/json');
-                    res.status(200).send(JSON.stringify({'result': 'success', 'msg': 'logged in Successfully'}));
+                    res.status(200).send(JSON.stringify({'result': 'success', 'msg': 'logged in Successfully','data':result[0]}));
                     console.log(session.user);
                 }
 
