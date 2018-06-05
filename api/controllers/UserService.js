@@ -365,42 +365,32 @@ exports.loginUser = function(args, res, next) {
 
   var username = args.swagger.params.username.value;
   var password = args.swagger.params.password.value;
-  var response = [];
+  var response = {};
 
-  if(username !== 'undefined' &&
-     password !== 'undefined'){
-    // args.getConnection(function (err, connection) {   
-    connection.query('SELECT MerchantID, Email FROM tbl_merchant WHERE companyName=? AND password=?',[username, password], function(err, result){
-      if(!err){
-        //console.log(result);
-        if (result.length<=0){
-          response.push({'result' : 'error', 'msg' : 'wrong username or password'});
-          res.setHeader('Content-Type', 'application/json');
-          res.status(200).send(JSON.stringify(response));
+    if (username !== 'undefined' && password !== 'undefined') {
 
-        }else{
-          response.push({'msg' : 'logged in Successfully'});
-          res.setHeader('Content-Type', 'application/json');
-          res.status(200).send(JSON.stringify(response));
-          console.log(session.user);
-        }
+        connection.query('SELECT MerchantID, Email FROM tbl_merchant WHERE companyName=? AND password=?', [username, password], function (err, result) {
+            if (!err) {
+                if (result.length <= 0) {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'wrong username or password'}));
 
-      }else{
-        res.json({ 'error': true, 'message': 'Error logging in' });
+                } else {
+                    res.setHeader('Content-Type', 'application/json');
+                    res.status(200).send(JSON.stringify({'result': 'success', 'msg': 'logged in Successfully'}));
+                    console.log(session.user);
+                }
 
-      }
+            } else {
+                res.json({'error': true, 'message': 'Error logging in'});
+            }
 
-    });
-    // });
-  }
-  else{
-    response.push({'result' : 'error', 'msg' : 'Please fill in the username and the password'});
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).send(JSON.stringify(response));
+        });
+    } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'Please fill in the username and the password'}));
 
-  }
-
-
+    }
 
 }
 
