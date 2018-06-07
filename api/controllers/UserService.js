@@ -215,16 +215,75 @@ exports.updateMerchant = function(args, res, next) {
    ){
      var companyName = args.body.companyName,
          shopName = args.body.shopName,
-         firstName = args.body.firstName,
          lastName = args.body.lastName,
          email = args.body.email,
-         password = args.body.currentPassword,
+         currentPassword = args.body.currentPassword,
          updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-         
+      var updateFields = 'UpdateDate = ?';
+      var updateValues = [updateDate];
+      if(typeof args.body.email !== 'undefined'){
+        updateFields += ',Email = ?';
+        updateValues.push(args.body.email);
+      }
+      if(typeof args.body.companyName !== 'undefined'){
+        updateFields += ',CompanyName = ?';
+        updateValues.push(args.body.companyName);
+      }
+      if(typeof args.body.firstName !== 'undefined'){
+        updateFields += ',FirstName = ?';
+        updateValues.push(args.body.firstName);
+      }
+      if(typeof args.body.lastName !== 'undefined'){
+        updateFields += ',LastName = ?';
+        updateValues.push(args.body.lastName);
+      }
+      if(typeof args.body.currentPassword !== 'undefined'){
+        updateFields += ',Password = ?';
+        updateValues.push(args.body.currentPassword);
+      }
+      if(typeof args.body.interests !== "undefined"){
+        updateFields += ',Interests = ?';
+        updateValues.push(args.body.interests);
+      }
+      if(typeof args.body.webUrl !== 'undefined'){
+        updateFields += ',WebUrl = ?';
+        updateValues.push(args.body.webUrl);
+      }
+      if(typeof args.body.streetAddress !== 'undefined'){
+        updateFields += ',StreetAddress = ?';
+        updateValues.push(args.body.streetAddress);
+      }
+      if(typeof args.body.city !== 'undefined'){
+        updateFields += ',City = ?';
+        updateValues.push(args.body.city);
+      }
+      if(typeof args.body.zipCode !== 'undefined'){
+        updateFields += ',ZipCode = ?';
+        updateValues.push(args.body.zipCode);
+      }
+      if(typeof args.body.countryID !== 'undefined'){
+        updateFields += ',CountryID = ?';
+        updateValues.push(args.body.countryID);
+      }
+      if(typeof args.body.stateID !== 'undefined'){
+        updateFields += ',StateID = ?';
+        updateValues.push(args.body.stateID);
+      }
+      if(typeof args.body.phoneNumber !== 'undefined'){
+        console.log('phoneNumber'+args.body.phoneNumber);
+        updateFields += ',PhoneNumber = ?';
+        updateValues.push(args.body.phoneNumber);
+      }
+      if(typeof args.body.planID !== 'undefined'){
+        updateFields += ',PlanID = ?';
+        updateValues.push(args.body.planID);
+      }
+      
       let updateMerchantID;
-      connection.query('UPDATE tbl_merchant SET CompanyName = ?,FirstName = ?,LastName = ?,Password = ?,Email = ?,UpdateDate = ? WHERE ShopName = ?', 
-        [companyName,firstName,lastName,password,email,updateDate,shopName],
+      connection.query('UPDATE tbl_merchant SET '+ updateFields +' WHERE ShopName = "'+shopName+'"',
+        updateValues,
           function(err,result){
+            console.log(this.sql);
             console.log(result);
             if(!err){
               response.result = 'success';
@@ -433,13 +492,8 @@ exports.getProducts = function(args, res, next) {
    var response = {};
    connection.query('SELECT * from tbl_product', function(err,result,fields){
      if(!err){
-
-       console.log("What is result.length??")
-       console.log(result.length);
-
        if(result.length !=0){
          response = {'result' : 'success', 'data' : result};
-         console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
@@ -464,10 +518,6 @@ exports.getPriceSegment = function(args, res, next) {
    var response = {};
    connection.query('SELECT * from  tbl_pricesegment', function(err,result,fields){
      if(!err){
-
-       console.log("What is result.length??")
-       console.log(result.length);
-
        if(result.length !=0){
          response = {'result' : 'success', 'data' : result};
          res.setHeader('Content-Type', 'application/json');
@@ -520,13 +570,8 @@ exports.getCountry = function(args, res, next) {
    var response = {};
    connection.query('SELECT * from  tbl_country', function(err,result,fields){
      if(!err){
-
-       console.log("What is result.length??")
-       console.log(result.length);
-
        if(result.length !=0){
          response = {'result' : 'success', 'data' : result};
-         console.log(response);
          res.setHeader('Content-Type', 'application/json');
          res.status(200).send(JSON.stringify(response));
        }
