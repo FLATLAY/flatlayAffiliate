@@ -169,9 +169,9 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "username"
+      - name: "email"
         in: "query"
-        description: "The user name for login"
+        description: "The email for login"
         required: true
         type: "string"
       - name: "password"
@@ -183,7 +183,7 @@ paths:
         200:
           description: "successful operation"
         400:
-          description: "Invalid username/password supplied"
+          description: "Invalid email/password supplied"
       x-swagger-router-controller: "UserService"
   /selectedPlan/{SHOP}:
     get:

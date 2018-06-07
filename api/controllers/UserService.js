@@ -18,7 +18,6 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 
-
 app.use(function(req, res, next) {
  res.header('Access-Control-Allow-Origin', '*');
  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -268,7 +267,7 @@ exports.connectAccount = function(args, res, next) {
             if(!err){
               if(result.affectedRows > 0){
                 response.result = 'success';
-                response.msg = 'Account disconnected sucessfully';
+                response.msg = 'Account connected sucessfully';
                 res.setHeader('Content-Type', 'application/json');
                 return res.status(200).send(JSON.stringify(response));
               }else{
@@ -358,22 +357,22 @@ exports.loginUser = function(args, res, next) {
    * login user into the system
    *
    *
-   * username - companyname / profile name
+   * email
    * password
 
    **/
 
-  var username = args.swagger.params.username.value;
+  var email = args.swagger.params.email.value;
   var password = args.swagger.params.password.value;
   var response = {};
 
-    if (username !== 'undefined' && password !== 'undefined') {
+    if (email !== 'undefined' && password !== 'undefined') {
 
-        connection.query('SELECT MerchantID, Email,ShopName FROM tbl_merchant WHERE companyName=? AND password=?', [username, password], function (err, result) {
+        connection.query('SELECT MerchantID, Email,ShopName FROM tbl_merchant WHERE email=? AND password=?', [email, password], function (err, result) {
             if (!err) {
                 if (result.length <= 0) {
                     res.setHeader('Content-Type', 'application/json');
-                    res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'wrong username or password'}));
+                    res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'wrong email or password'}));
 
                 } else {
                     res.setHeader('Content-Type', 'application/json');
@@ -388,7 +387,7 @@ exports.loginUser = function(args, res, next) {
         });
     } else {
         res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'Please fill in the username and the password'}));
+        res.status(200).send(JSON.stringify({'result': 'error', 'msg': 'Please fill in the email and the password'}));
 
     }
 
@@ -657,7 +656,7 @@ exports.productList = function(args, res, next){
       //console.log(result);
         storedProductIDs =  result;
          //console.log(storedProductIDs);
-        https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+        http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
 
           shop = shop+'.myshopify.com';
           res2.on('data', function (chunk) {
@@ -702,7 +701,7 @@ exports.productList = function(args, res, next){
 
         
       }else{
-        https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+        http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
           shop = shop+'.myshopify.com';
           res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
@@ -859,7 +858,7 @@ exports.productInfo = function(args, res1, next){
   var SHOP = args.body.shopName,
       productID = args.body.productID;
   var response = {};
-  https.get(HOSTNAME+'/getAccessToken/'+ SHOP, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ SHOP, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
         if(chunkObj.result == 'success'){
@@ -901,7 +900,7 @@ exports.productListCount = function(args, res1, next){
   var shop = /[^/]*$/.exec(args.url)[0];
   var response = {};
 
-  https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     shop = shop+'.myshopify.com';
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
@@ -935,7 +934,7 @@ exports.productUnpubListCount = function(args, res1, next){
   var shop = /[^/]*$/.exec(args.url)[0];
   var response = {};
 
-  https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     shop = shop+'.myshopify.com';
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
@@ -1034,7 +1033,7 @@ exports.changePlan = function(args, res, next){
 exports.createCheckout = function(args, res1, next){
   var shop = args.body.shopName,
       checkout = args.body.checkout;
-  https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
       var token = chunkObj.accessToken;
@@ -1099,7 +1098,7 @@ exports.updateCheckout = function(args, res1, next){
       countrycode = args.body.countrycode,
       phone = args.body.phone,
       zip = args.body.zip;
-  https.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
+  http.get(HOSTNAME+'/getAccessToken/'+ shop, function(res2) {
     res2.on('data', function (chunk) {
       var chunkObj = JSON.parse(chunk);
       console.log(chunkObj.accessToken);
@@ -1212,7 +1211,7 @@ exports.getShippingRatesCheckout = function (args, res1, next) {
     var SHOP = args.body.shop,
             checkoutTOKEN = args.body.token;
 
-    https.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
@@ -1245,7 +1244,7 @@ exports.putShippingRatesCheckout = function (args, res1, next) {
     var SHOP = args.body.shop,
             checkoutTOKEN = args.body.token,
             handle = args.body.handle;
-    https.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
@@ -1333,7 +1332,7 @@ exports.getpayment = function (args, res1, next) {
             checkoutTOKEN = args.body.checkouttoken,
             paymentID = args.body.paymentid;
 
-    https.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
+    http.get(HOSTNAME+'/getAccessToken/' + SHOP, function (res2) {
         res2.on('data', function (chunk) {
             var chunkObj = JSON.parse(chunk);
             var options = {
