@@ -1,8 +1,8 @@
 'use strict';
 
 var moment = require('moment');
-var http     = require('http'),
-    express  = require('express'),
+
+var express  = require('express'),
     mysql    = require('mysql'),
     parser   = require('body-parser'),
     session = require('express-session'),
@@ -17,6 +17,12 @@ const crypto = require('crypto');
 const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
+var HOSTNAME = process.env.HOSTNAME;
+if(HOSTNAME.indexOf('https') != -1){
+  var http = require('https');
+}else{
+  var http = require('http');
+}
 
 app.use(function(req, res, next) {
  res.header('Access-Control-Allow-Origin', '*');
