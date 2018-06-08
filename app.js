@@ -11,6 +11,7 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var config = require('./config.js');
+
 var cors = require('cors');
 var moment = require('moment');
 //New Setup express
@@ -22,6 +23,8 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 const request = require('request-promise');
+//File upload
+const fileUpload = require('express-fileupload');
 const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts';
 global.HOSTNAME = process.env.HOSTNAME;
 global.APIKEY = process.env.SHOPIFY_API_KEY;
@@ -67,6 +70,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   // parse application/x-www-form-urlencoded
   app.use(parser.urlencoded({ extended: true }));
 
+  app.use(fileUpload());
+
+  app.use('/public', express.static(__dirname + '/public'));
+
   app.use(function(req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -78,6 +85,32 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   });
 
   app.use(express.static(__dirname + '/public'));
+
+  app.post('/upload/profilepicture', (req, res, next) => {
+    let filePath = `${__dirname}/public/profile-images`;
+    if (!fs.existsSync(filePath)){
+        fs.mkdirSync(filePath);
+    }
+    let imageFile = req.files.file;
+    imageFile.mv(`${filePath}/${req.body.filename}`, function(err) {
+      if (err) {
+        return res.status(500).send(err);
+      }
+    var shopname = req.body.shopname,
+    profileImage = `/public/profile-images/${req.body.filename}`,
+    updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+    connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
+       [profileImage, updateDate,req.body.shopname],
+      function(err,result){
+        if(!err){
+          res.json({result: 'success'});
+        }else{
+          res.json({result: 'error','msg': 'Error while updating in database'});
+        }
+      });
+    });
+
+  })
   
   app.post('/webhook', (error, request) => {
     if (error) {
@@ -94,6 +127,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       return;
     }
     console.log('Yah we got a webhook In progress');
+    console.log(request.body);
     console.log(request.body.id);
     var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+request.body.id;
     connection.query(sql, function (err, result) {
