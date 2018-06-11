@@ -7,6 +7,7 @@ host: affiliate.flat-lay.com
 # basePath prefixes all resource paths 
 basePath: /
 tags:
+- name: "user"
 - name: "merchant"
   description: "Operations about merchant"
   externalDocs:
@@ -364,6 +365,7 @@ paths:
         404:
           description: "Country code not found"
       x-swagger-router-controller: "UserService"
+  
   /generateAccessToken/{SHOP}:
     get:
       tags:
@@ -676,6 +678,28 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/billingInfo:
+    post:
+      tags:
+      - "user"
+      summary: "User billing inforamtion"
+      description: "Billing information for the user"
+      operationId: "saveBillingInfo"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Billing"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -727,8 +751,54 @@ definitions:
       planID:
         type: "integer"
         format: "int32"
+      interests:
+        type: "string"
+      file:
+        type: "string"
     xml:
       name: "User"
+  Billing:
+    type: "object"
+    properties:
+      merchantID:
+        type: "integer"
+        format: "int32"
+      cardholderName:
+        type: "string"
+      cardholderNumber:
+        type: "integer"
+        format: "int32"
+      expireMonth:
+        type: "integer"
+        format: "int32"
+      expireYear:
+        type: "integer"
+        format: "int32"
+      cvv:
+        type: "integer"
+        format: "int32"
+      billingName:
+        type: "string"
+      streetAddress:
+        type: "string"
+      city:
+        type: "string"
+      zip:
+        type: "string"
+      countryID:
+        type: "integer"
+        format: "int32"
+      stateID:
+        type: "integer"
+        format: "int32"
+      saveCardInfo:
+        type: "integer"
+        format: "int32"
+      saveBillingInfo:
+        type: "integer"
+        format: "int32"
+    xml:
+      name: "Billing"
   putshippingratescheckout:
     type: "object"
     properties:

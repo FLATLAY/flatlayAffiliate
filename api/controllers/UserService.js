@@ -1408,3 +1408,73 @@ exports.getpayment = function (args, res1, next) {
         res1.status(400).send("error", error);
     });
 }
+
+// Dashboard APIs
+exports.saveBillingInfo = function(args, res, next) {
+  /**
+   * User billing inforamtion
+   * Billing information for the user
+   *
+   * body Billing Created user object
+   * no response value expected for this operation
+   **/
+   var response = [];
+   if(
+     typeof args.body.merchantID !== 'undefined' &&
+     typeof args.body.cardholderName !== 'undefined' &&
+     typeof args.body.cardholderNumber !== 'undefined' &&
+     typeof args.body.expireMonth !== 'undefined' &&
+     typeof args.body.expireYear !== 'undefined' &&
+     typeof args.body.cvv !== 'undefined'
+
+
+   ){
+     var merchantID = args.body.merchantID,
+         cardholderName = args.body.cardholderName,
+         cardholderNumber = args.body.cardholderNumber,
+         expireMonth = args.body.expireMonth,
+         expireYear = args.body.expireYear,
+         cvv = args.body.cvv,
+         billingName = args.body.billingName,
+         streetAddress = args.body.streetAddress,
+         city = args.body.city,
+         zip = args.body.zip,
+         countryID = args.body.countryID,
+         stateID = args.body.stateID,
+         saveCardInfo = args.body.saveCardInfo,
+         saveBillingInfo = args.body.saveBillingInfo,
+         createDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+
+      // args.getConnection(function (err, connection) {   
+      connection.query('INSERT INTO tbl_merchant_billing (MerchantID, CardholderName, CardholderNumber, ExpireMonth, ExpireYear, CVV, BillingName, SaveCardInfo, \
+        StreetAddress, City, Zip, CountryID, StateID, SaveBillingInfo, CreateDate)\
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [merchantID, cardholderName, cardholderNumber, expireMonth, expireYear, cvv, billingName, saveCardInfo, streetAddress, city, zip, countryID, stateID, saveBillingInfo, createDate],
+      function(err,result){
+        if(!err){
+          if(result.insertId != 0){
+            response.push({'result' : 'success'});
+          }
+          else{
+            response.push({'msg' : 'No data inserted'});
+          }
+          console.log(response);
+          res.setHeader('Content-Type', 'application/json');
+          res.status(200).send(JSON.stringify(response));
+        }
+        else{
+          console.log(err);
+          res.status(400).send(err);
+        }
+        //next();
+      });
+      // });
+   }
+   else{
+     response.push({'result' : 'error', 'msg' : 'Please fill required details'});
+     res.setHeader('Content-Type', 'application/json');
+     res.status(200).send(JSON.stringify(response));
+   }
+    console.log('Hola User');
+  //res.end();
+}

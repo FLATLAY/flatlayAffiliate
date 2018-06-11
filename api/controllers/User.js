@@ -129,5 +129,9 @@ module.exports.addstripecard = function addstripecard (req, res, next) {
   User.addstripecard(req.swagger.params, res, next);
 };
 
+module.exports.saveBillingInfo = function saveBillingInfo (req, res, next) {
+  User.saveBillingInfo(req.swagger.params, res, next);
+};
+
 
 module.exports = routes;
