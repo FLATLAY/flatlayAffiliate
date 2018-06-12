@@ -1226,34 +1226,43 @@ exports.updateCheckout = function(args, res1, next){
 */
 exports.addstripecard = function(args, res1, next){
 
-    var stripeAccountHeader = args.body.stripeAccountHeader,
-      client_id = args.body.client_id,
+    var client_id = args.body.client_id,
       cardNumber = args.body.cardNumber,
       exp_month = args.body.exp_month,
       exp_year = args.body.exp_year,
-      cvc = args.body.cvv;
+      cvv = args.body.cvv;
     var options = {
       method: 'POST',
       url: 'https://api.stripe.com/v1/tokens',
       headers: 
        {
-         'content-type': 'application/x-www-form-urlencoded',
          'Authorization': 'Bearer '+client_id,
-         'client_id': client_id
        },
       form: {
         'card[number]': cardNumber,
-        'card[exp_month]': exp_month,
+        'card[exp_month]': parseInt(exp_month.trim()),
         'card[exp_year]': exp_year,
-        'card[cvc]': cvc
+        'card[cvc]': cvv
       }
     };
-
+    console.log(options);
     // res1.status(200).send(options);
     request(options, function (error, response, body) {
-      if (error) throw new Error(error);
-      console.log(body);
-      res1.status(200).send(body);
+      if (error) {
+        res1.status(400).send(error);
+      }else{
+        var response = {};
+        var bodyParse = JSON.parse(body);
+        if(bodyParse.error){
+          response.result = 'error';
+          response.msg = bodyParse.error.message;
+          res1.status(200).send(response);
+        }else{
+          response.result = 'success';
+          response.data = {'token':bodyParse.id,'card_id':bodyParse.card.id};
+          res1.status(200).send(response);
+        }
+      }
     });
 }
 
@@ -1418,7 +1427,7 @@ exports.saveBillingInfo = function(args, res, next) {
    * body Billing Created user object
    * no response value expected for this operation
    **/
-   var response = [];
+   var response = {};
    if(
      typeof args.body.merchantID !== 'undefined' &&
      typeof args.body.cardholderName !== 'undefined' &&
@@ -1453,10 +1462,11 @@ exports.saveBillingInfo = function(args, res, next) {
       function(err,result){
         if(!err){
           if(result.insertId != 0){
-            response.push({'result' : 'success'});
+            response.result = 'success';
           }
           else{
-            response.push({'msg' : 'No data inserted'});
+            response.result = 'error';
+            response.msg = 'No data inserted';
           }
           console.log(response);
           res.setHeader('Content-Type', 'application/json');

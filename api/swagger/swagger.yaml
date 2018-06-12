@@ -766,17 +766,13 @@ definitions:
       cardholderName:
         type: "string"
       cardholderNumber:
-        type: "integer"
-        format: "int32"
+        type: "string"
       expireMonth:
-        type: "integer"
-        format: "int32"
+        type: "string"
       expireYear:
-        type: "integer"
-        format: "int32"
+        type: "string"
       cvv:
-        type: "integer"
-        format: "int32"
+        type: "string"
       billingName:
         type: "string"
       streetAddress:
@@ -792,11 +788,9 @@ definitions:
         type: "integer"
         format: "int32"
       saveCardInfo:
-        type: "integer"
-        format: "int32"
+        type: "boolean"
       saveBillingInfo:
-        type: "integer"
-        format: "int32"
+        type: "boolean"
     xml:
       name: "Billing"
   putshippingratescheckout:
@@ -903,8 +897,6 @@ definitions:
   stripepayment:
     type: "object"
     properties:
-      stripeAccountHeader:
-        type: "string"
       client_id:
         type: "string"
       cardNumber:
