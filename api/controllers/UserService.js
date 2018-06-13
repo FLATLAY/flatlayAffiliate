@@ -957,7 +957,7 @@ exports.productListCount = function(args, res1, next){
       var chunkObj = JSON.parse(chunk);
       if(chunkObj.result == 'success'){
         console.log(chunkObj.accessToken);
-        const shopRequestUrl = 'https://' + shop + '/admin/products/count.json?published_status=published';
+        const shopRequestUrl = 'https://' + shop + '/admin/product_listings/count.json';
         const shopRequestHeaders = {
           'X-Shopify-Access-Token': chunkObj.accessToken,
         };

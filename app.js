@@ -112,63 +112,58 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   })
   
-  app.post('/webhook', (error, request) => {
-    if (error) {
-      //console.error(error);
-      return;
-    }
-    //console.log('Yah we got a webhook');
-    return res.status(200).send(request.body);
+  app.post('/webhook/createProduct', (req, res) => {
+    var myshopify_domain = req.headers['x-shopify-shop-domain'];
+    var webhook_topic = req.headers['x-shopify-topic'];
+    console.log(req.body);
+    console.log('Yah we got a webhook for create product');
+    //console.log(request.body);
+    return res.status(200).send('OK');
   });
 
-  app.post('/webhook/removeSaleschannel', (error, request) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    console.log('Yah we got a webhook In progress');
-    console.log(request.body);
-    console.log(request.body.id);
-    var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+request.body.id;
+  app.post('/webhook/deleteProduct', (req, res) => {
+    var myshopify_domain = req.headers['x-shopify-shop-domain'];
+    console.log(req.body);
+    console.log('Yah we got a webhook for delete product');
+    //console.log(request.body);
+    return res.status(200).send('OK');
+  });
+
+  app.post('/webhook/removeSaleschannel', (req, res) => {
+    console.log('Yah we got a webhook for remove Saleschannel');
+    console.log(req.body);
+    var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+req.body.id;
     connection.query(sql, function (err, result) {
       if (err) throw err;
       console.log("Number of records deleted from tbl_merchant: " + result.affectedRows);
     });
-    var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+request.body.id;
+    var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+req.body.id;
     connection.query(sql, function (err, result) {
       if (err) throw err;
       console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
     });
-    var shopify_domain = request.body.myshopify_domain;
+    var shopify_domain = req.body.myshopify_domain;
     var shopName = shopify_domain.replace('.myshopify.com','');
     var sql = "DELETE FROM tbl_shop_products WHERE ShopName = "+shopName;
     connection.query(sql, function (err, result) {
       if (err) throw err;
       console.log("Number of records deleted from tbl_shop_products: " + result.affectedRows);
     });
-    return res.status(200).send(request.body);
+    return res.status(200).send('OK');
   });
 
-  app.post('/webhook/customers/redact', (error, request) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-
+  app.post('/webhook/customers/redact', (req, res) => {
+    console.log(req.body);
     console.log('Yah we got a webhook for customers/redact');
     
-    return res.status(200).send(request.body);
+    return res.status(200).send('OK');
   });
 
-  app.post('/webhook/shop/redact', (error, request) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    
+  app.post('/webhook/shop/redact', (req, res) => {
+    console.log(req.body);
     console.log('Yah we got a webhook for shop/redact');
     
-    return res.status(200).send(request.body);
+    return res.status(200).send('OK');
   });
 
   app.get('/shopify', (req, res) => {
@@ -334,7 +329,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
         body: 
          { webhook: 
             { topic: 'products/create',
-              address: 'https://affiliate.flat-lay.com/webhook',
+              address: 'https://affiliate.flat-lay.com/webhook/createProduct',
               format: 'json' } },
         json: true 
       };
@@ -355,7 +350,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
         body: 
          { webhook: 
             { topic: 'products/delete',
-              address: 'https://affiliate.flat-lay.com/webhook',
+              address: 'https://affiliate.flat-lay.com/webhook/deleteProduct',
               format: 'json' } },
         json: true 
       };
