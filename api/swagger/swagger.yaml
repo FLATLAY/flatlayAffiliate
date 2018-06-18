@@ -699,6 +699,27 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/createCampaign:
+    post:
+      tags:
+      - "user"
+      summary: "Add campaign paramters"
+      description: "Detail information of the Created campaign"
+      operationId: "createCampaign"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/NewCampaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
 
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -911,4 +932,29 @@ definitions:
     type: array
     items:
       type: integer
-  
+  NewCampaign:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+      title:
+        type: "string"
+      briefdescription:
+        type: "string"
+      fullbrief:
+        type: "string"
+      budget:
+        type: "integer"
+        format: "int32"
+      startdate: 
+        type: "string"
+      enddate:
+        type: "string"
+      facebook:
+        type: "boolean"
+      instagram:
+        type: "boolean"
+      twitter:
+        type: "boolean"
+      tumblr: 
+        type: "boolean"
