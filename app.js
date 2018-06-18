@@ -3,6 +3,7 @@
 var fs = require('fs'),
     path = require('path'),
     http     = require('http'),
+    https     = require('https'),
     express  = require('express'),
     mysql    = require('mysql'),
     parser   = require('body-parser');
@@ -11,7 +12,7 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var config = require('./config.js');
-
+var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
 //New Setup express
@@ -25,7 +26,7 @@ const querystring = require('querystring');
 const request = require('request-promise');
 //File upload
 const fileUpload = require('express-fileupload');
-const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts';
+const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts,read_content,write_content';
 global.HOSTNAME = process.env.HOSTNAME;
 global.APIKEY = process.env.SHOPIFY_API_KEY;
 global.APISECRET = process.env.SHOPIFY_API_SECRET;
@@ -86,18 +87,32 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   app.use(express.static(__dirname + '/public'));
 
+  // upload given file in floder
   app.post('/upload/profilepicture', (req, res, next) => {
-    let filePath = `${__dirname}/public/profile-images`;
+    
+    let filePath = `public/profile-images`;
     if (!fs.existsSync(filePath)){
         fs.mkdirSync(filePath);
     }
-    let imageFile = req.files.file;
-    imageFile.mv(`${filePath}/${req.body.filename}`, function(err) {
-      if (err) {
-        return res.status(500).send(err);
-      }
+    var filename = req.body.shopname;
+    if(typeof req.body.fileURL !== 'undefined'){
+      let URL_TO_REQUEST  = req.body.fileURL;
+      filename += path.extname(URL_TO_REQUEST);
+      var uri = url.parse(URL_TO_REQUEST);
+      
+      request(URL_TO_REQUEST).pipe(fs.createWriteStream(path.join(filePath, filename)));
+    }else{
+      filename += path.extname(req.files.file.name);
+      let imageFile = req.files.file;
+      imageFile.mv(`${filePath}/${filename}`, function(err) {
+        if (err) {
+          return res.status(500).send(err);
+        }
+      });
+    }
+    
     var shopname = req.body.shopname,
-    profileImage = `/public/profile-images/${req.body.filename}`,
+    profileImage = `/public/profile-images/${filename}`,
     updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
     connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
        [profileImage, updateDate,req.body.shopname],
@@ -108,10 +123,8 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
           res.json({result: 'error','msg': 'Error while updating in database'});
         }
       });
-    });
-
   })
-  
+
   app.post('/webhook/createProduct', (req, res) => {
     var myshopify_domain = req.headers['x-shopify-shop-domain'];
     var webhook_topic = req.headers['x-shopify-topic'];
