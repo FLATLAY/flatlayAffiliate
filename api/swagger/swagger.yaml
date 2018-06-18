@@ -715,11 +715,32 @@ paths:
         description: "Created user object"
         required: true
         schema:
-          $ref: "#/definitions/NewCampaign"
+          $ref: "#/definitions/Campaign"
       responses:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/viewCampaign/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View campaigns for a particular username"
+      operationId: "viewCampaign"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+
 
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -932,7 +953,7 @@ definitions:
     type: array
     items:
       type: integer
-  NewCampaign:
+  Campaign:
     type: "object"
     properties:
       username:
