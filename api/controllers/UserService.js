@@ -1530,6 +1530,21 @@ exports.createCampaign = function(args, res, next) {
          twitter = args.body.twitter,
          tumblr = args.body.tumblr;
 
+      var responsebody = {
+        "username": username, 
+        "title": title,  
+        "briefdescription": briefdescription, 
+        "fullbrief": fullbrief, 
+        "client": client, 
+        "budget": budget,  
+        "startdate": startdate, 
+        "enddate": enddate, 
+        "facebook": facebook, 
+        "instagram": instagram, 
+        "twitter": twitter, 
+        "tumblr": tumblr
+      };
+
       // args.getConnection(function (err, connection) {
       connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
@@ -1537,7 +1552,7 @@ exports.createCampaign = function(args, res, next) {
       function(err,result){
         if(!err){
           if(result.affectedRows != 0){
-            response.push({'result' : 'success', 'data' : result});
+            response.push({'result' : 'success', "body": responsebody, "campaignid": result.insertId});
           }
           else{
             response.push({'msg' : 'No result found'});
