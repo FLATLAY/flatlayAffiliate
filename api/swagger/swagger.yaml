@@ -720,13 +720,33 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
-  /user/viewCampaign/{username}:
+  /user/viewCampaigns/{username}:
     get:
       tags:
       - "user"
       summary: "View Campaign"
       description: "View campaigns for a particular username"
-      operationId: "viewCampaign"
+      operationId: "viewCampaigns"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+  /user/viewClients/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View clients for a particular username"
+      operationId: "viewClients"
       produces:
       - "application/xml"
       - "application/json"

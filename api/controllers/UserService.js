@@ -1556,7 +1556,7 @@ exports.createCampaign = function(args, res, next) {
   //res.end();
 }
 
-exports.viewCampaign = function(args, res, next){
+exports.viewCampaigns = function(args, res, next){
   var response = [];
   console.log(args.url);
   var username = /[^/]*$/.exec(args.url)[0];
@@ -1583,4 +1583,35 @@ exports.viewCampaign = function(args, res, next){
     }
 
   });
+}
+
+exports.viewClients = function(args, res, next){
+  //view clients associated with merchant account
+  var response = [];
+  console.log(args.url);
+  var username = /[^/]*$/.exec(args.url)[0];
+  // var webUrl = args.url;
+  console.log("userID: ", userID);
+  // args.getConnection(function (err, connection) {
+  connection.query('SELECT client FROM tbl_campaigns where username=?',
+  [username],
+  function(err,result){
+    if(!err){
+      if(result.affectedRows != 0){
+        response.push({'result' : result});
+        console.log("noerr", result);
+      }
+      else{
+        response.push({'msg' : 'No result found'});
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(JSON.stringify(response));
+    }
+    else{
+      console.log("elseerr", err);
+      res.status(400).send(err);
+    }
+
+  });
+
 }

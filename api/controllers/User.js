@@ -137,8 +137,12 @@ module.exports.createCampaign = function createCampaign (req, res, next) {
   User.createCampaign(req.swagger.params, res, next);
 };
 
-module.exports.viewCampaign = function viewCampaign (req, res, next) {
-  User.viewCampaign(req.swagger.params, res, next);
+module.exports.viewCampaigns = function viewCampaigns (req, res, next) {
+  User.viewCampaigns(req.swagger.params, res, next);
+};
+
+module.exports.viewClients = function viewClients (req, res, next) {
+  User.viewClients(req.swagger.params, res, next);
 };
 
 module.exports = routes;
