@@ -1536,9 +1536,11 @@ exports.createCampaign = function(args, res, next) {
         "briefdescription": briefdescription, 
         "fullbrief": fullbrief, 
         "client": client, 
-        "budget": budget,  
-        "startdate": startdate, 
-        "enddate": enddate, 
+        "budget": budget,
+        "daterange": {  
+          "startdate": startdate, 
+          "enddate": enddate
+        },
         "facebook": facebook, 
         "instagram": instagram, 
         "twitter": twitter, 
