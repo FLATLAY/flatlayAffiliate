@@ -987,17 +987,16 @@ definitions:
       client:
         type: "string"
       budget:
-        type: "integer"
-        format: "int32"
+        type: "string"
       startdate: 
         type: "string"
       enddate:
         type: "string"
       facebook:
-        type: "boolean"
+        type: "string"
       instagram:
-        type: "boolean"
+        type: "string"
       twitter:
-        type: "boolean"
+        type: "string"
       tumblr: 
-        type: "boolean"
+        type: "string"
