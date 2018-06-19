@@ -1533,7 +1533,7 @@ exports.createCampaign = function(args, res, next) {
       // args.getConnection(function (err, connection) {
       connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-      [username, title, date, briefdescription, fullbrief, client, budget, startdate, enddate],
+      [username, title, date, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr],
       function(err,result){
         if(!err){
           if(result.affectedRows != 0){
