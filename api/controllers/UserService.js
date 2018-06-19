@@ -1512,6 +1512,7 @@ exports.createCampaign = function(args, res, next) {
      typeof args.body.title !== 'undefined' &&
      typeof args.body.briefdescription !== 'undefined' &&
      typeof args.body.fullbrief !== 'undefined' &&
+     typeof args.body.client !== 'undefined' &&
      typeof args.body.budget !== 'undefined' &&
      typeof args.body.startdate !== 'undefined' &&
      typeof args.body.enddate !== 'undefined'
@@ -1520,6 +1521,7 @@ exports.createCampaign = function(args, res, next) {
          title = args.body.title,
          briefdescription = args.body.briefdescription,
          fullbrief = args.body.fullbrief,
+         client = args.body.client,
          budget  = args.body.budget,
          startdate = args.body.startdate,
          enddate = args.body.enddate, 
@@ -1529,8 +1531,8 @@ exports.createCampaign = function(args, res, next) {
          tumblr = args.body.tumblr;
 
       // args.getConnection(function (err, connection) {
-      connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+      connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
       [username, title, date, briefdescription, fullbrief, budget, startdate, enddate],
       function(err,result){
         if(!err){

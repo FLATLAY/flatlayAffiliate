@@ -964,6 +964,8 @@ definitions:
         type: "string"
       fullbrief:
         type: "string"
+      client:
+        type: "string"
       budget:
         type: "integer"
         format: "int32"
