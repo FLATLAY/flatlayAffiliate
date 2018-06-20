@@ -1488,3 +1488,147 @@ exports.saveBillingInfo = function(args, res, next) {
     console.log('Hola User');
   //res.end();
 }
+
+
+exports.createCampaign = function(args, res, next) {
+  /**
+   * post users' different actions on website content(posts/ collections/ products)
+   *
+   * body analytics Created user object
+   * no response value expected for this operation
+   **/
+  var date;
+  date = new Date();
+  date = date.getUTCFullYear() + '-' +
+      ('00' + (date.getUTCMonth()+1)).slice(-2) + '-' +
+      ('00' + date.getUTCDate()).slice(-2) + ' ' + 
+      ('00' + date.getUTCHours()).slice(-2) + ':' + 
+      ('00' + date.getUTCMinutes()).slice(-2) + ':' + 
+      ('00' + date.getUTCSeconds()).slice(-2);
+
+   var response = [];
+   if(
+     typeof args.body.username !== 'undefined' &&
+     typeof args.body.title !== 'undefined' &&
+     typeof args.body.briefdescription !== 'undefined' &&
+     typeof args.body.fullbrief !== 'undefined' &&
+     typeof args.body.client !== 'undefined' &&
+     typeof args.body.budget !== 'undefined' &&
+     typeof args.body.startdate !== 'undefined' &&
+     typeof args.body.enddate !== 'undefined'
+   ){
+     var username = args.body.username,
+         title = args.body.title,
+         briefdescription = args.body.briefdescription,
+         fullbrief = args.body.fullbrief,
+         client = args.body.client,
+         budget  = args.body.budget,
+         startdate = args.body.startdate,
+         enddate = args.body.enddate, 
+         facebook = args.body.facebook, 
+         instagram = args.body.instagram, 
+         twitter = args.body.twitter,
+         tumblr = args.body.tumblr;
+
+      var responsebody = {
+        "username": username, 
+        "title": title,  
+        "briefdescription": briefdescription, 
+        "fullbrief": fullbrief, 
+        "client": client, 
+        "budget": budget,
+        "daterange": {  
+          "startdate": startdate, 
+          "enddate": enddate
+        },
+        "facebook": facebook, 
+        "instagram": instagram, 
+        "twitter": twitter, 
+        "tumblr": tumblr
+      };
+
+      // args.getConnection(function (err, connection) {
+      connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [username, title, date, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr],
+      function(err,result){
+        if(!err){
+          if(result.affectedRows != 0){
+            response.push({'result' : 'success', "body": responsebody, "campaignid": result.insertId});
+          }
+          else{
+            response.push({'msg' : 'No result found'});
+          }
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.status(200).send(JSON.stringify(response));
+        }
+        else{
+          res.status(400).send(err);
+        }
+
+      });
+      // });
+  }
+  //res.end();
+}
+
+exports.viewCampaigns = function(args, res, next){
+  var response = [];
+  console.log(args.url);
+  var username = /[^/]*$/.exec(args.url)[0];
+  // var webUrl = args.url;
+  console.log("userID: ", userID);
+  // args.getConnection(function (err, connection) {
+  connection.query('SELECT * FROM tbl_campaigns where username=?',
+  [username],
+  function(err,result){
+    if(!err){
+      if(result.affectedRows != 0){
+        response.push({'result' : result});
+        console.log("noerr", result);
+      }
+      else{
+        response.push({'msg' : 'No result found'});
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(JSON.stringify(response));
+    }
+    else{
+      console.log("elseerr", err);
+      res.status(400).send(err);
+    }
+
+  });
+}
+
+exports.viewClients = function(args, res, next){
+  //view clients associated with merchant account
+  var response = [];
+  console.log(args.url);
+  var username = /[^/]*$/.exec(args.url)[0];
+  // var webUrl = args.url;
+  console.log("userID: ", userID);
+  // args.getConnection(function (err, connection) {
+  connection.query('SELECT client FROM tbl_campaigns where username=?',
+  [username],
+  function(err,result){
+    if(!err){
+      if(result.affectedRows != 0){
+        response.push({'result' : result});
+        console.log("noerr", result);
+      }
+      else{
+        response.push({'msg' : 'No result found'});
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).send(JSON.stringify(response));
+    }
+    else{
+      console.log("elseerr", err);
+      res.status(400).send(err);
+    }
+
+  });
+
+}

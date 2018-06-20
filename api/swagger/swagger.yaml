@@ -699,6 +699,68 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/createCampaign:
+    post:
+      tags:
+      - "user"
+      summary: "Add campaign paramters"
+      description: "Detail information of the Created campaign"
+      operationId: "createCampaign"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /user/viewCampaigns/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View campaigns for a particular username"
+      operationId: "viewCampaigns"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+  /user/viewClients/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View clients for a particular username"
+      operationId: "viewClients"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+
 
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -911,4 +973,30 @@ definitions:
     type: array
     items:
       type: integer
-  
+  Campaign:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+      title:
+        type: "string"
+      briefdescription:
+        type: "string"
+      fullbrief:
+        type: "string"
+      client:
+        type: "string"
+      budget:
+        type: "string"
+      startdate: 
+        type: "string"
+      enddate:
+        type: "string"
+      facebook:
+        type: "string"
+      instagram:
+        type: "string"
+      twitter:
+        type: "string"
+      tumblr: 
+        type: "string"
