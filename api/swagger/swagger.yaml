@@ -699,6 +699,33 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/updateSocialChannels/{username}:
+    post:
+      tags:
+      - "user"
+      summary: "Insert / Update user social channel"
+      description: "Insert / Update user social channel"
+      operationId: "updateUserSocialChannels"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "username of user needs to be update"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Social channels object"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateSocialChannels"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
   /user/createCampaign:
     post:
       tags:
@@ -855,6 +882,23 @@ definitions:
         type: "boolean"
     xml:
       name: "Billing"
+  UpdateSocialChannels:
+    type: "object"
+    properties:
+      facebook:
+        type: "string"
+      twitter:
+        type: "string"
+      instagram:
+        type: "string"
+      pinterest:
+        type: "string"
+      snapchat:
+        type: "string"
+      youtube:
+        type: "string"
+      tumblr:
+        type: "string"
   putshippingratescheckout:
     type: "object"
     properties:

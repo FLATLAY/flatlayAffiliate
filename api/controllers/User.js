@@ -133,6 +133,10 @@ module.exports.saveBillingInfo = function saveBillingInfo (req, res, next) {
   User.saveBillingInfo(req.swagger.params, res, next);
 };
 
+module.exports.updateUserSocialChannels = function updateUserSocialChannels (req, res, next) {
+  User.updateUserSocialChannels(req.swagger.params, res, next);
+};
+
 module.exports.createCampaign = function createCampaign (req, res, next) {
   User.createCampaign(req.swagger.params, res, next);
 };
