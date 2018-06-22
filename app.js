@@ -185,7 +185,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     if (shop) {
       const state = nonce();
       const redirectUri = HOSTNAME + '/shopify/callback';
-      const installUrl = 'https://' + shop +'.myshopify.com'+
+      const installUrl = 'https://' + shop +
         '/admin/oauth/authorize?client_id=' + APIKEY +
         '&scope=' + scopes +
         '&state=' + state +
