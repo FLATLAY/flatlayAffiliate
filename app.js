@@ -184,6 +184,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
     const shop = req.query.shop;
     if (shop) {
       const state = nonce();
+      console.log(state);
       const redirectUri = HOSTNAME + '/shopify/callback';
       const installUrl = 'https://' + shop +
         '/admin/oauth/authorize?client_id=' + APIKEY +
@@ -203,11 +204,11 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
   app.get('/shopify/callback', (req, res) => {
     // EX. shop will be ipsteststore.myshopify.com here
     const { shop, hmac, code, state } = req.query;
-    const stateCookie = cookie.parse(req.headers.cookie).state;
+   // const stateCookie = cookie.parse(req.headers.cookie).state;
 
-    if (state !== stateCookie) {
+    /*if (state !== stateCookie) {
       return res.status(403).send('Request origin cannot be verified');
-    }
+    }*/
     
     if (shop && hmac && code) {
       // DONE: Validate request is from Shopify

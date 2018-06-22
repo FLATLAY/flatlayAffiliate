@@ -672,34 +672,35 @@ exports.getShopDataByShopName = function (args, res, next) {
   // Get access token from database by shop name and display
   var shop = /[^/]*$/.exec(args.url)[0];
    connection.query('SELECT * from tbl_merchant where ShopName = ?', shop, function(err,result,fields){
-    if(!err && result.length > 0){
-      connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', result[0].MerchantID, function(err,billingresult,fields){
-
-        if(!err && billingresult.length > 0){
-          console.log(billingresult);
-          response.result = 'success';
-          response.data = result[0];
-          response.data.billing =billingresult[0];
-          console.log(response);
-          res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          res.status(200).send(JSON.stringify(response));
-        }else{
-          response.result = 'success';
-          response.data = result[0];
-          console.log(response);
-          res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          res.status(200).send(JSON.stringify(response));
-        }
-      });
-        
+    if(!err){
+      if(result.length > 0){
+        connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', result[0].MerchantID, function(err,billingresult,fields){
+          if(!err && billingresult.length > 0){
+            response.result = 'success';
+            response.data = result[0];
+            response.data.billing =billingresult[0];
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.status(200).send(JSON.stringify(response));
+          }else{
+            response.result = 'success';
+            response.data = result[0];
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.status(200).send(JSON.stringify(response));
+          }
+        });
+      }else{
+        response.result = 'error';
+        response.data = 'Shop not found or Invalid shop name';
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(200).send(JSON.stringify(response));
+      }
     }else{
-      response.result = 'error';
-      response.data = 'Shop not found or Invalid shop name';
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Access-Control-Allow-Origin', '*');
-      res.status(400).send(JSON.stringify(response));
+      res.status(400).send(JSON.stringify(err));
     }
   });
 
