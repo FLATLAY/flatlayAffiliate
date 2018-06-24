@@ -1,4 +1,4 @@
-import { webhooks as stripe } from '../../modules/server/stripe';
+import { webhooks as stripe } from '../api/controllers/Stripe';
 
 export default {
 	stripe(type, data) {
