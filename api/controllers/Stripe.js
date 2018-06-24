@@ -1,5 +1,14 @@
 import stripe from 'stripe';
 
+export const webhooks = {
+  'customer.subscription.deleted': customerSubscriptionDeleted,
+  'customer.subscription.updated': customerSubscriptionUpdated,
+  'invoice.payment_succeeded': invoicePaymentSucceeded,
+};
+
+const API_SECRET_KEY = '';
+const stripe = stripe(API_SECRET_KEY);
+
 /*
   customer = {
     description: String,
@@ -7,14 +16,14 @@ import stripe from 'stripe';
   };
 */
 export const createCustomer = customer =>
-	stripe.customers.create(customer);
+  stripe.customers.create(customer);
 
 /*
   customerId: String,
   update: Object, // Contains properties to update on Stripe. For example: { source: <token> }
 */
 export const updateCustomer = (customerId, update) =>
-	stripe.customers.update(customerId, update);
+  stripe.customers.update(customerId, update);
 
 /*
   subscription = {
@@ -23,17 +32,17 @@ export const updateCustomer = (customerId, update) =>
   };
 */
 export const createSubscription = subscription =>
-	stripe.subscriptions.create(subscription);
+  stripe.subscriptions.create(subscription);
 
 /*
   subscriptionId = String; // The ID of the subscription on Stripe. For example: sub_AGLTRCbGMwmQcQ.
 */
 export const cancelSubscription = subscriptionId =>
-	stripe.subscriptions.del(subscriptionId, { at_period_end: true });
+  stripe.subscriptions.del(subscriptionId, { at_period_end: true });
 
 /*
   subscriptionId = String; // The ID of the subscription on Stripe. For example: sub_AGLTRCbGMwmQcQ.
   update = Object; // Contains properties to update on Stripe. For example: { plan: "large" }
 */
 export const changeSubscription = (subscriptionId, update) =>
-	stripe.subscriptions.update(subscriptionId, update);
+  stripe.subscriptions.update(subscriptionId, update);
