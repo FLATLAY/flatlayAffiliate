@@ -1,5 +1,9 @@
 import stripe from 'stripe';
 
+import customerSubscriptionDeleted from '../../webhooks/customer.subscription.deleted';
+import customerSubscriptionUpdated from '../../webhooks/customer.subscription.updated';
+import invoicePaymentSucceeded from '../../webhooks/invoice.payment_succeeded';
+
 export const webhooks = {
   'customer.subscription.deleted': customerSubscriptionDeleted,
   'customer.subscription.updated': customerSubscriptionUpdated,
@@ -7,7 +11,7 @@ export const webhooks = {
 };
 
 const API_SECRET_KEY = '';
-const stripe = stripe(API_SECRET_KEY);
+const action = stripe(API_SECRET_KEY);
 
 /*
   customer = {
@@ -16,14 +20,14 @@ const stripe = stripe(API_SECRET_KEY);
   };
 */
 export const createCustomer = customer =>
-  stripe.customers.create(customer);
+  action.customers.create(customer);
 
 /*
   customerId: String,
   update: Object, // Contains properties to update on Stripe. For example: { source: <token> }
 */
 export const updateCustomer = (customerId, update) =>
-  stripe.customers.update(customerId, update);
+  action.customers.update(customerId, update);
 
 /*
   subscription = {
@@ -32,17 +36,17 @@ export const updateCustomer = (customerId, update) =>
   };
 */
 export const createSubscription = subscription =>
-  stripe.subscriptions.create(subscription);
+  action.subscriptions.create(subscription);
 
 /*
   subscriptionId = String; // The ID of the subscription on Stripe. For example: sub_AGLTRCbGMwmQcQ.
 */
 export const cancelSubscription = subscriptionId =>
-  stripe.subscriptions.del(subscriptionId, { at_period_end: true });
+  action.subscriptions.del(subscriptionId, { at_period_end: true });
 
 /*
   subscriptionId = String; // The ID of the subscription on Stripe. For example: sub_AGLTRCbGMwmQcQ.
   update = Object; // Contains properties to update on Stripe. For example: { plan: "large" }
 */
 export const changeSubscription = (subscriptionId, update) =>
-  stripe.subscriptions.update(subscriptionId, update);
+  action.subscriptions.update(subscriptionId, update);
