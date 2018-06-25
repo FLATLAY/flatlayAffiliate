@@ -1,10 +1,10 @@
 var mysql = require('mysql');
 
 var connection = mysql.createConnection({
-	host: 'localhost',
+	host: '127.0.0.1',
 	user: 'root',
-	password: '',
-	database: 'flatlayapi'
+	password: 'idea!23',
+	database: 'flatlay_affiliate'
 });
 try {
 	connection.connect();
