@@ -5,6 +5,17 @@ let action;
 const createCustomerInDatabase = customer => {
     try {
         // insert single customer into User table SQL
+        connection.query('INSERT INTO tbl_user ()\
+            VALUES(?)',
+        [customer],
+        (err, result) => {
+            if(!err){
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(JSON.stringify(result));
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }
@@ -43,6 +54,17 @@ const createUser = ({ email, password, profile }) => {
          *   profile: <profile>
          * }
          */
+        connection.query('INSERT INTO tbl_user (email, password, profile)\
+            VALUES(?,?,?)',
+        [email, password, profile],
+        (err, result) => {
+            if(!err){
+                res.setHeader('Content-Type', 'application/json');
+                res.status(200).send(JSON.stringify(result));
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }
