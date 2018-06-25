@@ -1,11 +1,11 @@
 import { createCustomer, createSubscription } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
 const createCustomerInDatabase = async customer => {
     try {
-        // insert single customer into User table SQL
-        return await connection.query('INSERT INTO tbl_user () VALUES(?)', [customer]);
+        return await database.query('INSERT INTO tbl_user () VALUES(?)', [customer]);
     } catch (exception) {
         action.reject(exception);
     }
@@ -34,36 +34,19 @@ const createCustomerOnStripe = ({ userId, profile, email }, source) => {
     }
 };
 
-const createUser = ({ email, password, profile }) => {
+const createUser = async ({ email, password, profile }) => {
     try {
-        /**
-         * Create a single "customer" in database
-         * {
-         *   email: <email>
-         *   password: <password>
-         *   profile: <profile>
-         * }
-         */
-        connection.query('INSERT INTO tbl_user (email, password, profile)\
-            VALUES(?,?,?)',
-        [email, password, profile],
-        (err, result) => {
-            if(!err){
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).send(JSON.stringify(result));
-            } else {
-
-            }
-        });
+        return await database.query('INSERT INTO tbl_user (email, password, profile)\
+            VALUES(?,?,?)', [email, password, profile]);
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const handleSignup = (options, promise) => {
+const handleSignup = async (options, promise) => {
     try {
         action = promise;
-        const userId = createUser(options.user);
+        const userId = await createUser(options.user);
 
         createCustomerOnStripe({ ...options.user, userId }, options.source)
             .then(customer => {

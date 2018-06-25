@@ -1,39 +1,31 @@
 import { cancelSubscription } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
-const getCustomer = (userId) => {
+const getCustomer = async (userId) => {
     try {
         // return User findOne by userId SQL
+        connection.query('SELECT * FROM tbl_user where userid=?',
+        [userId],
+        function(err, result){
+            if(!err){
+
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const handleCancelSubscription = (userId, promise) => {
+const handleCancelSubscription = async (userId, promise) => {
     try {
-        const customer = getCustomer(userId);
+        const customer = await getCustomer(userId);
         cancelSubscription(customer.subscription.id)
             .then(current_period_end => {
-
-                /**
-                 * Update user SQL:
-                 *
-                 * subscription {
-                 *   status: 'cancelling'
-                 *   current_period_end: <current_period_end>
-                 * }
-                 *
-                 */
-                connection.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)',
-                [current_period_end],
-                function(err, result){
-                    if(!err){
-
-                    } else {
-
-                    }
-                });
+                database.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)', [current_period_end]);
             })
             .catch(error => action.reject(error));
     } catch (exception) {

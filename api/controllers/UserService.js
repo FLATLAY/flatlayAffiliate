@@ -9,9 +9,8 @@ var express = require('express'),
 	nodemailer = require('nodemailer'),
 	https = require('https'),
 	request = require('request-promise');
-const config = require('../../config.js');
+const connection = require('../../config.js');
 var app = express();
-
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
 const cookie = require('cookie');
@@ -424,7 +423,7 @@ exports.loginUser = function (args, res, next) {
 	 *
 	 * email
 	 * password
-  
+
 	 **/
 
 	var email = args.swagger.params.email.value;

@@ -764,8 +764,8 @@ paths:
     post:
       tags:
         - "stripe"
-      summary:
-      description:
+      summary: "Sign up with Stripe"
+      description: "Sign up with Stripe"
       operationId: "handleSignup"
       produces:
         - "application/xml"
@@ -785,8 +785,8 @@ paths:
     post:
       tags:
         - "stripe"
-      summary:
-      description:
+      summary: "Change Stripe subscription"
+      description: "Change stripe subscription"
       operationId: "handleChangeSubscription"
       produces:
         - "application/xml"
@@ -794,10 +794,10 @@ paths:
       parameters:
       - in: "body"
         name: "body"
-        description: ""
+        description: "change subscription"
         required: true
         schema:
-          $ref: "#/definitions/Campaign"
+          $ref: "#/definitions/ChangeSubscription"
       responses:
         200:
           description: "OK"
@@ -806,8 +806,8 @@ paths:
     post:
       tags:
         - "stripe"
-      summary: ""
-      description: ""
+      summary: "Cancel stripe subscription"
+      description: "cancel stripe subscription"
       operationId: "handleCancelSubscription"
       produces:
         - "application/xml"
@@ -818,7 +818,7 @@ paths:
         description: "Email, password, plan, profile"
         required: true
         schema:
-          $ref: "#/definitions/Campaign"
+          $ref: "#/definitions/CancelSubscription"
       responses:
         200:
           description: "OK"
@@ -827,8 +827,8 @@ paths:
     put:
       tags:
         - "stripe"
-      summary: ""
-      description: ""
+      summary: "Update Stripe Payment"
+      description: "Update Stripe Payment"
       operationId: "handleUpdatePayment"
       produces:
         - "application/xml"
@@ -839,7 +839,7 @@ paths:
         description: "Email, password, plan, profile"
         required: true
         schema:
-          $ref: "#/definitions/Campaign"
+          $ref: "#/definitions/UpdatePayment"
       responses:
         200:
           description: "OK"
@@ -1104,3 +1104,20 @@ definitions:
                 type: "string"
               last:
                 type: "string"
+  ChangeSubscription:
+    type: "object"
+    properties:
+      userId: 
+        type: "string"
+      newPlan:
+        type: "string"
+  CancelSubscription:
+    type: "object"
+    properties: 
+      userId:
+        type: "string"
+  UpdatePayment:
+    type: "object"
+    properties:
+      tokenId:
+        type: "string"
