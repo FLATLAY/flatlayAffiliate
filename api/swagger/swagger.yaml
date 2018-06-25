@@ -776,7 +776,11 @@ paths:
         description: "Email, password, plan, profile"
         required: true
         schema:
-          $ref: "#/definitions/Campaign"
+          $ref: "#/definitions/StripeSignup"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
   /changeSubscription:
     post:
       tags:
@@ -794,6 +798,10 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/Campaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
   /cancelSubscription:
     post:
       tags:
@@ -811,6 +819,10 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/Campaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
   /updatePayment:
     put:
       tags:
@@ -828,6 +840,10 @@ paths:
         required: true
         schema:
           $ref: "#/definitions/Campaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
 
 
   /swagger:
@@ -1069,3 +1085,22 @@ definitions:
         type: "boolean"
       tumblr: 
         type: "boolean"
+  StripeSignup:
+    type: "object"
+    properties:
+      email: 
+        type: "string"
+      password:
+        type: "string"
+      plan:
+        type: "string"
+      profile:
+        type: "object"
+        properties:
+          name:
+            type: "object"
+            properties:
+              first:
+                type: "string"
+              last:
+                type: "string"
