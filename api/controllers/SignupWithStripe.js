@@ -43,7 +43,7 @@ const createUser = async ({ email, password, profile }) => {
     }
 };
 
-const handleSignup = (options, promise) => {
+const handleSignup = async (options, promise) => {
     try {
         action = promise;
         const userId = await createUser(options.user);
