@@ -1,4 +1,4 @@
-import stripe from 'stripe';
+import stripePackage from 'stripe';
 
 export const webhooks = {
   'customer.subscription.deleted': customerSubscriptionDeleted,
@@ -6,8 +6,8 @@ export const webhooks = {
   'invoice.payment_succeeded': invoicePaymentSucceeded,
 };
 
-const API_SECRET_KEY = '';
-const stripe = stripe(API_SECRET_KEY);
+const API_SECRET_KEY = 'pk_live_t7ZN7UCX5c796aGxu65SznV1';
+const stripe = stripePackage(API_SECRET_KEY);
 
 /*
   customer = {
