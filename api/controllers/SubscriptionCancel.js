@@ -5,16 +5,7 @@ let action;
 
 const getCustomer = async (userId) => {
     try {
-        // return User findOne by userId SQL
-        connection.query('SELECT * FROM tbl_user where userid=?',
-        [userId],
-        function(err, result){
-            if(!err){
-
-            } else {
-
-            }
-        });
+        return await database.query('SELECT * FROM tbl_user where userid=?', [userId]);
     } catch (exception) {
         action.reject(exception);
     }
