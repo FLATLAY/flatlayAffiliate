@@ -1,10 +1,11 @@
 import { createCustomer, createSubscription } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
 const createCustomerInDatabase = async customer => {
     try {
-        return await connection.query('INSERT INTO tbl_user () VALUES(?)', [customer]);
+        return await database.query('INSERT INTO tbl_user () VALUES(?)', [customer]);
     } catch (exception) {
         action.reject(exception);
     }
@@ -35,7 +36,7 @@ const createCustomerOnStripe = ({ userId, profile, email }, source) => {
 
 const createUser = async ({ email, password, profile }) => {
     try {
-        return await connection.query('INSERT INTO tbl_user (email, password, profile)\
+        return await database.query('INSERT INTO tbl_user (email, password, profile)\
             VALUES(?,?,?)', [email, password, profile]);
     } catch (exception) {
         action.reject(exception);
