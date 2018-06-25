@@ -5,6 +5,15 @@ let action;
 const getCustomer = (userId) => {
     try {
         // return user findOne by userId SQL
+        connection.query('SELECT * FROM tbl_user WHERE id=?)',
+        [userId],
+        function(err, result){
+            if(!err){
+
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }
