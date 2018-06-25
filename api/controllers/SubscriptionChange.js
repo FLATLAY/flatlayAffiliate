@@ -5,6 +5,15 @@ let action;
 const getCustomer = (userId) => {
     try {
         // return User findOne by userId SQL
+        connection.query('SELECT * FROM tbl_user where userid=?',
+        [userId],
+        function(err, result){
+            if(!err){
+
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }
@@ -23,6 +32,15 @@ const updateCustomer = (customerId, { id, status, plan, current_period_end }) =>
          * }
          *
          */
+        connection.query('UPDATE tbl_user SET subscriptionid=?, status=?, plan=?, current_period_end=?)',
+        [id, status, plan, current_period_end],
+        function(err, result){
+            if(!err){
+
+            } else {
+
+            }
+        });
     } catch (exception) {
         action.reject(exception);
     }

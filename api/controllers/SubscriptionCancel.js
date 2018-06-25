@@ -25,6 +25,15 @@ const handleCancelSubscription = (userId, promise) => {
                  * }
                  *
                  */
+                connection.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)',
+                [current_period_end],
+                function(, result){
+                    if(!err){
+
+                    } else {
+
+                    }
+                });
             })
             .catch(error => action.reject(error));
     } catch (exception) {

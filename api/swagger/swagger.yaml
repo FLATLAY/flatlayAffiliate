@@ -365,7 +365,7 @@ paths:
         404:
           description: "Country code not found"
       x-swagger-router-controller: "UserService"
-  
+
   /generateAccessToken/{SHOP}:
     get:
       tags:
@@ -656,7 +656,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"  
+      x-swagger-router-controller: "UserService"
   /addstripecard:
     post:
       tags:
@@ -760,6 +760,74 @@ paths:
           description: "Successful"
           schema:
             $ref: "#/definitions/Campaign"
+  /signupWithStripe:
+    post:
+      tags:
+        - "stripe"
+      summary:
+      description:
+      operationId: "handleSignup"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
+  /changeSubscription:
+    post:
+      tags:
+        - "stripe"
+      summary:
+      description:
+      operationId: "handleChangeSubscription"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: ""
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
+  /cancelSubscription:
+    post:
+      tags:
+        - "stripe"
+      summary: ""
+      description: ""
+      operationId: "handleCancelSubscription"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
+  /updatePayment:
+    put:
+      tags:
+        - "stripe"
+      summary: ""
+      description: ""
+      operationId: "handleUpdatePayment"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
 
 
   /swagger:
