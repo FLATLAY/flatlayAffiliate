@@ -1,7 +1,7 @@
 const mysql = require('mysql');
 
 class Database {
-    constructor(config) {
+    constructor() {
         this.connection = mysql.createConnection({
             host: '127.0.0.1',
             user: 'root',

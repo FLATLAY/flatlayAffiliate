@@ -18,27 +18,7 @@ const handleUpdatePayment = ({ userId, source }, promise) => {
             updateCustomer(customer.customerId, { source })
                 .then(sources => {
                     const card = sources.data[0];
-
-                    /**
-                     * Update user SQL:
-                     *
-                     * card {
-                     *   brand: card.brand
-                     *   last4: card.last4
-                     * }
-                     *
-                     */
-                    connection.query('UPDATE tbl_user SET brand=?, last4=?)',
-                    [card.brand, card.last4],
-                    function(err, result){
-                        if(!err){
-
-                        } else {
-
-                        }
-                    });
-
-                    action.resolve();
+                    database.query('UPDATE tbl_user SET brand=?, last4=?)', [card.brand, card.last4]);
                 })
                 .catch((exception) => {
                     action.reject(exception);

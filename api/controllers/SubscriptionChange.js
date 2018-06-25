@@ -1,55 +1,30 @@
 import { createSubscription, changeSubscription } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
-const getCustomer = (userId) => {
+const getCustomer = async (userId) => {
     try {
         // return User findOne by userId SQL
-        connection.query('SELECT * FROM tbl_user where userid=?',
-        [userId],
-        function(err, result){
-            if(!err){
-
-            } else {
-
-            }
-        });
+        return await database.query('SELECT * FROM tbl_user where userid=?', [userId])
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const updateCustomer = (customerId, { id, status, plan, current_period_end }) => {
+const updateCustomer = async (customerId, { id, status, plan, current_period_end }) => {
     try {
-        /**
-         * Update user SQL:
-         *
-         * subscription {
-         *   id: <id>
-         *   status: <current_period_end>
-         *   plan: <plan.id>
-         *   current_period_end: <current_period_end>
-         * }
-         *
-         */
-        connection.query('UPDATE tbl_user SET subscriptionid=?, status=?, plan=?, current_period_end=?)',
-        [id, status, plan, current_period_end],
-        function(err, result){
-            if(!err){
-
-            } else {
-
-            }
-        });
+        return await database.query('UPDATE tbl_user SET subscriptionid=?, status=?, plan=?, current_period_end=?)',
+            [id, status, plan, current_period_end]);
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const handleChangeSubscription = ({ userId, newPlan }, promise) => {
+const handleChangeSubscription = async ({ userId, newPlan }, promise) => {
     try {
         action = promise;
-        const customer = getCustomer(userId);
+        const customer = await getCustomer(userId);
         const status = customer.subscription.status;
         const hasSubscription = status === 'active' || status === 'trialing' || status === 'cancelling';
 

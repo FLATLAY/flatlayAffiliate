@@ -1,4 +1,5 @@
 import { cancelSubscription } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
@@ -15,25 +16,7 @@ const handleCancelSubscription = (userId, promise) => {
         const customer = getCustomer(userId);
         cancelSubscription(customer.subscription.id)
             .then(current_period_end => {
-
-                /**
-                 * Update user SQL:
-                 *
-                 * subscription {
-                 *   status: 'cancelling'
-                 *   current_period_end: <current_period_end>
-                 * }
-                 *
-                 */
-                connection.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)',
-                [current_period_end],
-                function(, result){
-                    if(!err){
-
-                    } else {
-
-                    }
-                });
+                database.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)', [current_period_end]);
             })
             .catch(error => action.reject(error));
     } catch (exception) {
