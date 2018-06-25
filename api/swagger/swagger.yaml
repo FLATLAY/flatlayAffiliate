@@ -453,7 +453,8 @@ paths:
         in: "path"
         description: "The MerchantID for which needs to retrive data"
         required: true
-        type: "string"
+        type: "integer"
+        format: "int32"
       responses:
         200:
           description: "Successful operation"
@@ -723,21 +724,21 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
-  /user/updateSocialChannels/{username}:
+  /user/updateSocialChannels/{merchantID}:
     post:
       tags:
       - "user"
       summary: "Insert / Update user social channel"
       description: "Insert / Update user social channel"
-      operationId: "updateUserSocialChannels"
+      operationId: "updateSocialChannels"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - name: "username"
+      - name: "merchantID"
         in: "path"
-        description: "username of user needs to be update"
+        description: "merchantID of merchant needs to be update"
         required: true
         type: "string"
       - in: "body"
