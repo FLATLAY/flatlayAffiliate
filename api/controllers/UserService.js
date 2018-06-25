@@ -705,6 +705,49 @@ exports.getShopDataByShopName = function (args, res, next) {
   });
 
 }
+
+exports.getMerchantData = function (args, res, next) {
+  var response = {};
+  
+  var merchantID = /[^/]*$/.exec(args.url)[0];
+   connection.query('SELECT * from tbl_merchant where MerchantID = ?', merchantID, function(err,result,fields){
+    if(!err){
+      if(result.length > 0){
+          connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', result[0].MerchantID, function(err,billingresult,fields){
+            if(!err && billingresult.length > 0){
+              console.log(billingresult);
+              response.result = 'success';
+              response.data = result[0];
+              response.data.billing =billingresult[0];
+              console.log(response);
+              res.setHeader('Content-Type', 'application/json');
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              res.status(200).send(JSON.stringify(response));
+            }else{
+              response.result = 'success';
+              response.data = result[0];
+              console.log(response);
+              res.setHeader('Content-Type', 'application/json');
+              res.setHeader('Access-Control-Allow-Origin', '*');
+              res.status(200).send(JSON.stringify(response));
+            }
+        });
+      }else{
+        response.result = 'error';
+        response.data = 'Merchant not found';
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.status(400).send(JSON.stringify(response));
+      }
+    }else{
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(404).send(JSON.stringify(err));
+    }
+  });
+
+}
+
  var storedProductIDs = [];
 
 

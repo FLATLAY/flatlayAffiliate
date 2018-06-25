@@ -438,6 +438,30 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /getMerchantData/{MerchantID}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get merchant data by merchant id"
+      description: "Get merchant data by merchant id"
+      operationId: "getMerchantData"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "MerchantID"
+        in: "path"
+        description: "The MerchantID for which needs to retrive data"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid Merchant ID OR Merchant not found"
+        404:
+          description: "Bad request"
+      x-swagger-router-controller: "UserService"
   /productList/{SHOP}:
     get:
       tags:

@@ -73,6 +73,10 @@ module.exports.getShopDataByShopName = function getShopDataByShopName (req, res,
   User.getShopDataByShopName(req.swagger.params, res, next);
 };
 
+module.exports.getMerchantData = function getMerchantData (req, res, next) {
+  User.getMerchantData(req.swagger.params, res, next);
+};
+
 module.exports.addProduct = function addProduct (req, res, next) {
   User.addProduct(req.swagger.params, res, next);
 };
