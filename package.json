@@ -1,41 +1,48 @@
 {
-   "name": "flatlay-affiliate",
-   "version": "0.0.1",
-   "private": true,
-   "description": "flatlayaffiliate API",
-   "keywords": [],
-   "author": "",
-   "license": "",
-   "main": "app.js",
-   "dependencies": {
-      "@shopify/polaris": "^2.0.0",
-      "@shopify/shopify-express": "^1.0.0-alpha.7",
-      "amazon-product-api": "^0.4.4",
-      "connect": "^3.2.0",
-      "cookie": "^0.3.1",
-      "cors": "^2.8.4",
-      "dotenv": "^5.0.1",
-      "express": "^4.16.3",
-      "js-yaml": "^3.3.0",
-      "moment": "^2.18.1",
-      "morgan": "^1.9.0",
-      "mysql": "^2.14.1",
-      "nodemailer": "^4.6.4",
-      "nonce": "^1.0.4",
-      "react": "^16.3.2",
-      "react-dom": "^16.3.2",
-      "reload": "^2.2.2",
-      "request": "^2.85.0",
-      "request-promise": "^4.2.2",
-      "stripe": "^6.0.0",
-      "swagger-express": "^1.0.5",
-      "swagger-tools": "0.10.1"
-   },
-   "devDependencies": {
-      "should": "^7.1.0",
-      "supertest": "^1.0.0"
-   },
-   "scripts": {
-      "start": "node app.js"
-   }
+    "name": "flatlay-affiliate",
+    "version": "0.0.1",
+    "private": true,
+    "description": "flatlayaffiliate API",
+    "keywords": [],
+    "author": "",
+    "license": "",
+    "main": "app.js",
+    "dependencies": {
+        "@babel/runtime": "^7.0.0-beta.51",
+        "@shopify/polaris": "^2.0.0",
+        "@shopify/shopify-express": "^1.0.0-alpha.7",
+        "amazon-product-api": "^0.4.4",
+        "connect": "^3.2.0",
+        "cookie": "^0.3.1",
+        "cors": "^2.8.4",
+        "dotenv": "^5.0.1",
+        "express": "^4.16.3",
+        "express-fileupload": "^0.4.0",
+        "js-yaml": "^3.3.0",
+        "moment": "^2.18.1",
+        "morgan": "^1.9.0",
+        "mysql": "^2.14.1",
+        "nodemailer": "^4.6.4",
+        "nonce": "^1.0.4",
+        "react": "^16.3.2",
+        "react-dom": "^16.3.2",
+        "reload": "^2.2.2",
+        "request": "^2.85.0",
+        "request-promise": "^4.2.2",
+        "stripe": "^6.0.0",
+        "swagger-express": "^1.0.5",
+        "swagger-tools": "0.10.1"
+    },
+    "devDependencies": {
+        "babel-cli": "^6.26.0",
+        "babel-preset-es2015": "^6.24.1",
+        "babel-preset-stage-2": "^6.24.1",
+        "babel-register": "^6.26.0",
+        "should": "^7.1.0",
+        "supertest": "^1.0.0"
+    },
+    "scripts": {
+        "start": "nodemon ./app.js --exec babel-node --presets es2015,stage-2",
+        "build": "babel lib -d dist"
+    }
 }
