@@ -1,19 +1,20 @@
 import { updateCustomer } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
-const getCustomer = (userId) => {
+const getCustomer = async (userId) => {
     try {
-        // return user findOne by userId SQL
+        return await database.query('<query>', ['args']);
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const handleUpdatePayment = ({ userId, source }, promise) => {
+const handleUpdatePayment = async ({ userId, source }, promise) => {
     try {
         action = promise;
-        const customer = getCustomer(userId);
+        const customer = await getCustomer(userId);
         if (customer) {
             updateCustomer(customer.customerId, { source })
                 .then(sources => {
