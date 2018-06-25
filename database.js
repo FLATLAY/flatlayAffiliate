@@ -1,6 +1,6 @@
 import mysql from 'mysql';
 
-class Database {
+export class Database {
     constructor() {
         this.connection = mysql.createConnection({
             host: '127.0.0.1',
@@ -28,5 +28,3 @@ class Database {
         });
     }
 }
-
-export default Database;

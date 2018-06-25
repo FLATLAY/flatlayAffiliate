@@ -1,28 +1,20 @@
 import { updateCustomer } from './Stripe';
+import { database } from '../../database';
 
 let action;
 
-const getCustomer = (userId) => {
+const getCustomer = async (userId) => {
     try {
-        // return user findOne by userId SQL
-        connection.query('SELECT * FROM tbl_user WHERE id=?)',
-        [userId],
-        function(err, result){
-            if(!err){
-
-            } else {
-
-            }
-        });
+        return await database.query('SELECT * FROM tbl_user WHERE id=?)', [userId]);
     } catch (exception) {
         action.reject(exception);
     }
 };
 
-const handleUpdatePayment = ({ userId, source }, promise) => {
+const handleUpdatePayment = async ({ userId, source }, promise) => {
     try {
         action = promise;
-        const customer = getCustomer(userId);
+        const customer = await getCustomer(userId);
         if (customer) {
             updateCustomer(customer.customerId, { source })
                 .then(sources => {
