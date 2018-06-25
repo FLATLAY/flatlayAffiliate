@@ -3,7 +3,7 @@ import { database } from '../../database';
 
 let action;
 
-const getCustomer = (userId) => {
+const getCustomer = async (userId) => {
     try {
         // return User findOne by userId SQL
     } catch (exception) {
@@ -11,9 +11,9 @@ const getCustomer = (userId) => {
     }
 };
 
-const handleCancelSubscription = (userId, promise) => {
+const handleCancelSubscription = async (userId, promise) => {
     try {
-        const customer = getCustomer(userId);
+        const customer = await getCustomer(userId);
         cancelSubscription(customer.subscription.id)
             .then(current_period_end => {
                 database.query('UPDATE tbl_user SET status=cancelling, current_period_end=?)', [current_period_end]);

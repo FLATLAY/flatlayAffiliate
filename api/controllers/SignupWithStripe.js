@@ -46,7 +46,7 @@ const createUser = async ({ email, password, profile }) => {
 const handleSignup = (options, promise) => {
     try {
         action = promise;
-        const userId = createUser(options.user);
+        const userId = await createUser(options.user);
 
         createCustomerOnStripe({ ...options.user, userId }, options.source)
             .then(customer => {
