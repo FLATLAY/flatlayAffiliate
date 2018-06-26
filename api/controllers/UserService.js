@@ -1840,24 +1840,28 @@ exports.viewClients = function (args, res, next) {
 
 
 exports.handleSignup = function (args, res, next) {
+	console.log(args);
 	return signupWithStripe(args).then(result => {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
 }
 
 exports.handleChangeSubscription = function (args, res, next) {
+	console.log(args);
 	return handleChangeSubscription(args).then(result => {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
 }
 
 exports.handleCancelSubscription = function (args, res, next) {
+	console.log(args);
 	return handleCancelSubscription(args).then(result => {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
 }
 
 exports.handleUpdatePayment = function (args, res, next) {
+	console.log(args);
 	return handleUpdatePayment(args).then(result => {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
