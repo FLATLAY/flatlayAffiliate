@@ -24,8 +24,8 @@ if (HOSTNAME.indexOf('https') != -1) {
 }
 
 import signupWithStripe from './SignupWithStripe';
-import handleChangeSubscription from './handleChangeSubscription';
-import handleCancelSubscription from './handleCancelSubscription';
+import handleChangeSubscription from './SubscriptionChange';
+import handleCancelSubscription from './SubscriptionCancel';
 import handleUpdatePayment from './Payment';
 
 app.use(function (req, res, next) {
