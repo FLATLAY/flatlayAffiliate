@@ -1,9 +1,11 @@
 'use strict';
 
+import connection from './config';
+
 var fs = require('fs'),
 	path = require('path'),
 	http = require('http'),
-    https     = require('https'),
+	https = require('https'),
 	express = require('express'),
 	mysql = require('mysql'),
 	parser = require('body-parser');
@@ -11,7 +13,6 @@ var reload = require('reload');
 var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
-var connection = require('./config.js');
 var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
@@ -87,96 +88,96 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
 	app.use(express.static(__dirname + '/public'));
 
-  // upload given file in floder
+	// upload given file in floder
 	app.post('/upload/profilepicture', (req, res, next) => {
-    
-    let filePath = `public/profile-images`;
+
+		let filePath = `public/profile-images`;
 		if (!fs.existsSync(filePath)) {
 			fs.mkdirSync(filePath);
 		}
-    var filename = req.body.shopname;
-    if(typeof req.body.fileURL !== 'undefined'){
-      let URL_TO_REQUEST  = req.body.fileURL;
-      filename += path.extname(URL_TO_REQUEST);
-      var uri = url.parse(URL_TO_REQUEST);
-      
-      request(URL_TO_REQUEST).pipe(fs.createWriteStream(path.join(filePath, filename)));
-    }else{
-      filename += path.extname(req.files.file.name);
-		let imageFile = req.files.file;
-      imageFile.mv(`${filePath}/${filename}`, function(err) {
-			if (err) {
-				return res.status(500).send(err);
-			}
-      });
-    }
-    
-			var shopname = req.body.shopname,
-    profileImage = `/public/profile-images/${filename}`,
-				updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
-				[profileImage, updateDate, req.body.shopname],
-				function (err, result) {
-					if (!err) {
-						res.json({ result: 'success' });
-					} else {
-						res.json({ result: 'error', 'msg': 'Error while updating in database' });
-					}
-				});
+		var filename = req.body.shopname;
+		if (typeof req.body.fileURL !== 'undefined') {
+			let URL_TO_REQUEST = req.body.fileURL;
+			filename += path.extname(URL_TO_REQUEST);
+			var uri = url.parse(URL_TO_REQUEST);
+
+			request(URL_TO_REQUEST).pipe(fs.createWriteStream(path.join(filePath, filename)));
+		} else {
+			filename += path.extname(req.files.file.name);
+			let imageFile = req.files.file;
+			imageFile.mv(`${filePath}/${filename}`, function (err) {
+				if (err) {
+					return res.status(500).send(err);
+				}
+			});
+		}
+
+		var shopname = req.body.shopname,
+			profileImage = `/public/profile-images/${filename}`,
+			updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+		connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
+			[profileImage, updateDate, req.body.shopname],
+			function (err, result) {
+				if (!err) {
+					res.json({ result: 'success' });
+				} else {
+					res.json({ result: 'error', 'msg': 'Error while updating in database' });
+				}
+			});
 	})
 
-  app.post('/webhook/createProduct', (req, res) => {
-    var myshopify_domain = req.headers['x-shopify-shop-domain'];
-    var webhook_topic = req.headers['x-shopify-topic'];
-    console.log(req.body);
-    console.log('Yah we got a webhook for create product');
-    //console.log(request.body);
-    return res.status(200).send('OK');
+	app.post('/webhook/createProduct', (req, res) => {
+		var myshopify_domain = req.headers['x-shopify-shop-domain'];
+		var webhook_topic = req.headers['x-shopify-topic'];
+		console.log(req.body);
+		console.log('Yah we got a webhook for create product');
+		//console.log(request.body);
+		return res.status(200).send('OK');
 	});
 
-  app.post('/webhook/deleteProduct', (req, res) => {
-    var myshopify_domain = req.headers['x-shopify-shop-domain'];
-    console.log(req.body);
-    console.log('Yah we got a webhook for delete product');
-    //console.log(request.body);
-    return res.status(200).send('OK');
-  });
+	app.post('/webhook/deleteProduct', (req, res) => {
+		var myshopify_domain = req.headers['x-shopify-shop-domain'];
+		console.log(req.body);
+		console.log('Yah we got a webhook for delete product');
+		//console.log(request.body);
+		return res.status(200).send('OK');
+	});
 
-  app.post('/webhook/removeSaleschannel', (req, res) => {
-    console.log('Yah we got a webhook for remove Saleschannel');
-    console.log(req.body);
-    var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+req.body.id;
+	app.post('/webhook/removeSaleschannel', (req, res) => {
+		console.log('Yah we got a webhook for remove Saleschannel');
+		console.log(req.body);
+		var sql = "DELETE FROM tbl_merchant WHERE ShopID = " + req.body.id;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_merchant: " + result.affectedRows);
 		});
-    var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+req.body.id;
+		var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = " + req.body.id;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
 		});
-    var shopify_domain = req.body.myshopify_domain;
+		var shopify_domain = req.body.myshopify_domain;
 		var shopName = shopify_domain.replace('.myshopify.com', '');
 		var sql = "DELETE FROM tbl_shop_products WHERE ShopName = " + shopName;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_shop_products: " + result.affectedRows);
 		});
-    return res.status(200).send('OK');
+		return res.status(200).send('OK');
 	});
 
-  app.post('/webhook/customers/redact', (req, res) => {
-    console.log(req.body);
+	app.post('/webhook/customers/redact', (req, res) => {
+		console.log(req.body);
 		console.log('Yah we got a webhook for customers/redact');
 
-    return res.status(200).send('OK');
+		return res.status(200).send('OK');
 	});
 
-  app.post('/webhook/shop/redact', (req, res) => {
-    console.log(req.body);
+	app.post('/webhook/shop/redact', (req, res) => {
+		console.log(req.body);
 		console.log('Yah we got a webhook for shop/redact');
 
-    return res.status(200).send('OK');
+		return res.status(200).send('OK');
 	});
 
 	app.get('/shopify', (req, res) => {
@@ -184,9 +185,9 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 		const shop = req.query.shop;
 		if (shop) {
 			const state = nonce();
-      console.log(state);
+			console.log(state);
 			const redirectUri = HOSTNAME + '/shopify/callback';
-      const installUrl = 'https://' + shop +
+			const installUrl = 'https://' + shop +
 				'/admin/oauth/authorize?client_id=' + APIKEY +
 				'&scope=' + scopes +
 				'&state=' + state +
@@ -204,11 +205,11 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 	app.get('/shopify/callback', (req, res) => {
 		// EX. shop will be ipsteststore.myshopify.com here
 		const { shop, hmac, code, state } = req.query;
-   // const stateCookie = cookie.parse(req.headers.cookie).state;
+		// const stateCookie = cookie.parse(req.headers.cookie).state;
 
-    /*if (state !== stateCookie) {
-			return res.status(403).send('Request origin cannot be verified');
-    }*/
+		/*if (state !== stateCookie) {
+				return res.status(403).send('Request origin cannot be verified');
+		}*/
 
 		if (shop && hmac && code) {
 			// DONE: Validate request is from Shopify
@@ -346,7 +347,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					webhook:
 					{
 						topic: 'products/create',
-              address: 'https://affiliate.flat-lay.com/webhook/createProduct',
+						address: 'https://affiliate.flat-lay.com/webhook/createProduct',
 						format: 'json'
 					}
 				},
@@ -372,7 +373,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					webhook:
 					{
 						topic: 'products/delete',
-              address: 'https://affiliate.flat-lay.com/webhook/deleteProduct',
+						address: 'https://affiliate.flat-lay.com/webhook/deleteProduct',
 						format: 'json'
 					}
 				},
