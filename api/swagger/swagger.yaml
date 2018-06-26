@@ -4,9 +4,10 @@ info:
   title: Flatlay
 # during dev, should point to your local machine
 host: affiliate.flat-lay.com
-# basePath prefixes all resource paths 
+# basePath prefixes all resource paths
 basePath: /
 tags:
+- name: "user"
 - name: "merchant"
   description: "Operations about merchant"
   externalDocs:
@@ -22,7 +23,7 @@ tags:
   externalDocs:
     description: "Find out more about our store"
     url: "http://swagger.io"
-# 
+#
 schemes:
   # tip: remove http to make production-grade
   - https
@@ -169,9 +170,9 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "username"
+      - name: "email"
         in: "query"
-        description: "The user name for login"
+        description: "The email for login"
         required: true
         type: "string"
       - name: "password"
@@ -183,7 +184,7 @@ paths:
         200:
           description: "successful operation"
         400:
-          description: "Invalid username/password supplied"
+          description: "Invalid email/password supplied"
       x-swagger-router-controller: "UserService"
   /selectedPlan/{SHOP}:
     get:
@@ -364,6 +365,7 @@ paths:
         404:
           description: "Country code not found"
       x-swagger-router-controller: "UserService"
+
   /generateAccessToken/{SHOP}:
     get:
       tags:
@@ -435,6 +437,31 @@ paths:
           description: "Invalid shop name"
         404:
           description: "Shop not found"
+      x-swagger-router-controller: "UserService"
+  /getMerchantData/{MerchantID}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get merchant data by merchant id"
+      description: "Get merchant data by merchant id"
+      operationId: "getMerchantData"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "MerchantID"
+        in: "path"
+        description: "The MerchantID for which needs to retrive data"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid Merchant ID OR Merchant not found"
+        404:
+          description: "Bad request"
       x-swagger-router-controller: "UserService"
   /productList/{SHOP}:
     get:
@@ -654,7 +681,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"  
+      x-swagger-router-controller: "UserService"
   /addstripecard:
     post:
       tags:
@@ -676,6 +703,201 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/billingInfo:
+    post:
+      tags:
+      - "user"
+      summary: "User billing inforamtion"
+      description: "Billing information for the user"
+      operationId: "saveBillingInfo"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Billing"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /user/updateSocialChannels/{merchantID}:
+    post:
+      tags:
+      - "user"
+      summary: "Insert / Update user social channel"
+      description: "Insert / Update user social channel"
+      operationId: "updateSocialChannels"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "merchantID"
+        in: "path"
+        description: "merchantID of merchant needs to be update"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Social channels object"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateSocialChannels"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /user/createCampaign:
+    post:
+      tags:
+      - "user"
+      summary: "Add campaign paramters"
+      description: "Detail information of the Created campaign"
+      operationId: "createCampaign"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/Campaign"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /user/viewCampaigns/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View campaigns for a particular username"
+      operationId: "viewCampaigns"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+  /user/viewClients/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "View Campaign"
+      description: "View clients for a particular username"
+      operationId: "viewClients"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "username"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+          schema:
+            $ref: "#/definitions/Campaign"
+  /signupWithStripe:
+    post:
+      tags:
+        - "stripe"
+      summary: "Sign up with Stripe"
+      description: "Sign up with Stripe"
+      operationId: "handleSignup"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/StripeSignup"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /changeSubscription:
+    post:
+      tags:
+        - "stripe"
+      summary: "Change Stripe subscription"
+      description: "Change stripe subscription"
+      operationId: "handleChangeSubscription"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "change subscription"
+        required: true
+        schema:
+          $ref: "#/definitions/ChangeSubscription"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /cancelSubscription:
+    post:
+      tags:
+        - "stripe"
+      summary: "Cancel stripe subscription"
+      description: "cancel stripe subscription"
+      operationId: "handleCancelSubscription"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/CancelSubscription"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+  /updatePayment:
+    put:
+      tags:
+        - "stripe"
+      summary: "Update Stripe Payment"
+      description: "Update Stripe Payment"
+      operationId: "handleUpdatePayment"
+      produces:
+        - "application/xml"
+        - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Email, password, plan, profile"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdatePayment"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
+
+
   /swagger:
     x-swagger-pipe: swagger_raw
 
@@ -700,7 +922,7 @@ definitions:
         type: "string"
       category:
         $ref: "#/definitions/Category"
-      productID: 
+      productID:
         type: "integer"
         format: "int32"
       priceSegmentID:
@@ -727,8 +949,65 @@ definitions:
       planID:
         type: "integer"
         format: "int32"
+      interests:
+        type: "string"
+      file:
+        type: "string"
     xml:
       name: "User"
+  Billing:
+    type: "object"
+    properties:
+      merchantID:
+        type: "integer"
+        format: "int32"
+      cardholderName:
+        type: "string"
+      cardholderNumber:
+        type: "string"
+      expireMonth:
+        type: "string"
+      expireYear:
+        type: "string"
+      cvv:
+        type: "string"
+      billingName:
+        type: "string"
+      streetAddress:
+        type: "string"
+      city:
+        type: "string"
+      zip:
+        type: "string"
+      countryID:
+        type: "integer"
+        format: "int32"
+      stateID:
+        type: "integer"
+        format: "int32"
+      saveCardInfo:
+        type: "boolean"
+      saveBillingInfo:
+        type: "boolean"
+    xml:
+      name: "Billing"
+  UpdateSocialChannels:
+    type: "object"
+    properties:
+      facebook:
+        type: "string"
+      twitter:
+        type: "string"
+      instagram:
+        type: "string"
+      pinterest:
+        type: "string"
+      snapchat:
+        type: "string"
+      youtube:
+        type: "string"
+      tumblr:
+        type: "string"
   putshippingratescheckout:
     type: "object"
     properties:
@@ -833,8 +1112,6 @@ definitions:
   stripepayment:
     type: "object"
     properties:
-      stripeAccountHeader:
-        type: "string"
       client_id:
         type: "string"
       cardNumber:
@@ -849,4 +1126,67 @@ definitions:
     type: array
     items:
       type: integer
-  
+  Campaign:
+    type: "object"
+    properties:
+      username:
+        type: "string"
+      title:
+        type: "string"
+      briefdescription:
+        type: "string"
+      fullbrief:
+        type: "string"
+      client:
+        type: "string"
+      budget:
+        type: "integer"
+        format: "int32"
+      startdate:
+        type: "string"
+      enddate:
+        type: "string"
+      facebook:
+        type: "string"
+      instagram:
+        type: "string"
+      twitter:
+        type: "boolean"
+      tumblr:
+        type: "boolean"
+  StripeSignup:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+      plan:
+        type: "string"
+      profile:
+        type: "object"
+        properties:
+          name:
+            type: "object"
+            properties:
+              first:
+                type: "string"
+              last:
+                type: "string"
+  ChangeSubscription:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      newPlan:
+        type: "string"
+  CancelSubscription:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+  UpdatePayment:
+    type: "object"
+    properties:
+      tokenId:
+        type: "string"
