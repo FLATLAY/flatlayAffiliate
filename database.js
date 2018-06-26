@@ -2,12 +2,7 @@ import mysql from 'mysql';
 
 export class Database {
     constructor() {
-        this.connection = mysql.createConnection({
-            host: '127.0.0.1',
-            user: 'root',
-            password: 'idea!23',
-            database: 'flatlay_affiliate'
-        });
+        this.connection = connection;
     }
     query(sql, args) {
         return new Promise((resolve, reject) => {

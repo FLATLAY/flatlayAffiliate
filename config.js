@@ -1,9 +1,9 @@
 var mysql = require('mysql');
 
-var connection = mysql.createConnection({
+global.connection = mysql.createConnection({
 	host: '127.0.0.1',
 	user: 'root',
-	password: 'idea!23',
+	password: 'password',
 	database: 'flatlay_affiliate'
 });
 try {

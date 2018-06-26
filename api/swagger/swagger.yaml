@@ -4,7 +4,7 @@ info:
   title: Flatlay
 # during dev, should point to your local machine
 host: affiliate.flat-lay.com
-# basePath prefixes all resource paths 
+# basePath prefixes all resource paths
 basePath: /
 tags:
 - name: "user"
@@ -23,7 +23,7 @@ tags:
   externalDocs:
     description: "Find out more about our store"
     url: "http://swagger.io"
-# 
+#
 schemes:
   # tip: remove http to make production-grade
   - https
@@ -780,7 +780,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"
+      x-swagger-router-controller: "SignupWithStripe"
   /changeSubscription:
     post:
       tags:
@@ -801,7 +801,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"
+      x-swagger-router-controller: "SubscriptionChange"
   /cancelSubscription:
     post:
       tags:
@@ -822,7 +822,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"
+      x-swagger-router-controller: "SubscriptionCancel"
   /updatePayment:
     put:
       tags:
@@ -843,7 +843,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "UserService"
+      x-swagger-router-controller: "Payment"
 
 
   /swagger:
@@ -870,7 +870,7 @@ definitions:
         type: "string"
       category:
         $ref: "#/definitions/Category"
-      productID: 
+      productID:
         type: "integer"
         format: "int32"
       priceSegmentID:
@@ -1073,7 +1073,7 @@ definitions:
       budget:
         type: "integer"
         format: "int32"
-      startdate: 
+      startdate:
         type: "string"
       enddate:
         type: "string"
@@ -1083,12 +1083,12 @@ definitions:
         type: "boolean"
       twitter:
         type: "boolean"
-      tumblr: 
+      tumblr:
         type: "boolean"
   StripeSignup:
     type: "object"
     properties:
-      email: 
+      email:
         type: "string"
       password:
         type: "string"
@@ -1107,13 +1107,13 @@ definitions:
   ChangeSubscription:
     type: "object"
     properties:
-      userId: 
+      userId:
         type: "string"
       newPlan:
         type: "string"
   CancelSubscription:
     type: "object"
-    properties: 
+    properties:
       userId:
         type: "string"
   UpdatePayment:
