@@ -1,6 +1,6 @@
 import connection from './config';
 
-export class Database {
+export default class Database {
     constructor() {
         this.connection = connection;
     }
