@@ -438,6 +438,31 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
+  /getMerchantData/{MerchantID}:
+    get:
+      tags:
+      - "merchant"
+      summary: "Get merchant data by merchant id"
+      description: "Get merchant data by merchant id"
+      operationId: "getMerchantData"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "MerchantID"
+        in: "path"
+        description: "The MerchantID for which needs to retrive data"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid Merchant ID OR Merchant not found"
+        404:
+          description: "Bad request"
+      x-swagger-router-controller: "UserService"
   /productList/{SHOP}:
     get:
       tags:
@@ -699,6 +724,33 @@ paths:
         200:
           description: "OK"
       x-swagger-router-controller: "UserService"
+  /user/updateSocialChannels/{merchantID}:
+    post:
+      tags:
+      - "user"
+      summary: "Insert / Update user social channel"
+      description: "Insert / Update user social channel"
+      operationId: "updateSocialChannels"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "merchantID"
+        in: "path"
+        description: "merchantID of merchant needs to be update"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Social channels object"
+        required: true
+        schema:
+          $ref: "#/definitions/UpdateSocialChannels"
+      responses:
+        200:
+          description: "OK"
+      x-swagger-router-controller: "UserService"
   /user/createCampaign:
     post:
       tags:
@@ -939,6 +991,23 @@ definitions:
         type: "boolean"
     xml:
       name: "Billing"
+  UpdateSocialChannels:
+    type: "object"
+    properties:
+      facebook:
+        type: "string"
+      twitter:
+        type: "string"
+      instagram:
+        type: "string"
+      pinterest:
+        type: "string"
+      snapchat:
+        type: "string"
+      youtube:
+        type: "string"
+      tumblr:
+        type: "string"
   putshippingratescheckout:
     type: "object"
     properties:
@@ -1071,53 +1140,16 @@ definitions:
       client:
         type: "string"
       budget:
-        type: "integer"
-        format: "int32"
+        type: "string"
       startdate:
         type: "string"
       enddate:
         type: "string"
       facebook:
-        type: "boolean"
+        type: "string"
       instagram:
-        type: "boolean"
+        type: "string"
       twitter:
-        type: "boolean"
+        type: "string"
       tumblr:
-        type: "boolean"
-  StripeSignup:
-    type: "object"
-    properties:
-      email:
-        type: "string"
-      password:
-        type: "string"
-      plan:
-        type: "string"
-      profile:
-        type: "object"
-        properties:
-          name:
-            type: "object"
-            properties:
-              first:
-                type: "string"
-              last:
-                type: "string"
-  ChangeSubscription:
-    type: "object"
-    properties:
-      userId:
-        type: "string"
-      newPlan:
-        type: "string"
-  CancelSubscription:
-    type: "object"
-    properties:
-      userId:
-        type: "string"
-  UpdatePayment:
-    type: "object"
-    properties:
-      tokenId:
         type: "string"

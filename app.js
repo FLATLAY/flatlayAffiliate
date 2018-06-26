@@ -3,6 +3,7 @@
 var fs = require('fs'),
 	path = require('path'),
 	http = require('http'),
+    https     = require('https'),
 	express = require('express'),
 	mysql = require('mysql'),
 	parser = require('body-parser');
@@ -11,7 +12,7 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var connection = require('./config.js');
-
+var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
 //New Setup express
@@ -25,7 +26,7 @@ const querystring = require('querystring');
 const request = require('request-promise');
 //File upload
 const fileUpload = require('express-fileupload');
-const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts';
+const scopes = 'read_product_listings,read_products,write_products,read_orders,write_orders,read_shipping,write_shipping,read_customers,write_customers,read_checkouts,write_checkouts,read_content,write_content';
 global.HOSTNAME = process.env.HOSTNAME;
 global.APIKEY = process.env.SHOPIFY_API_KEY;
 global.APISECRET = process.env.SHOPIFY_API_SECRET;
@@ -86,18 +87,32 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
 	app.use(express.static(__dirname + '/public'));
 
+  // upload given file in floder
 	app.post('/upload/profilepicture', (req, res, next) => {
-		let filePath = `${__dirname}/public/profile-images`;
+    
+    let filePath = `public/profile-images`;
 		if (!fs.existsSync(filePath)) {
 			fs.mkdirSync(filePath);
 		}
+    var filename = req.body.shopname;
+    if(typeof req.body.fileURL !== 'undefined'){
+      let URL_TO_REQUEST  = req.body.fileURL;
+      filename += path.extname(URL_TO_REQUEST);
+      var uri = url.parse(URL_TO_REQUEST);
+      
+      request(URL_TO_REQUEST).pipe(fs.createWriteStream(path.join(filePath, filename)));
+    }else{
+      filename += path.extname(req.files.file.name);
 		let imageFile = req.files.file;
-		imageFile.mv(`${filePath}/${req.body.filename}`, function (err) {
+      imageFile.mv(`${filePath}/${filename}`, function(err) {
 			if (err) {
 				return res.status(500).send(err);
 			}
+      });
+    }
+    
 			var shopname = req.body.shopname,
-				profileImage = `/public/profile-images/${req.body.filename}`,
+    profileImage = `/public/profile-images/${filename}`,
 				updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
 			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
 				[profileImage, updateDate, req.body.shopname],
@@ -108,67 +123,60 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 						res.json({ result: 'error', 'msg': 'Error while updating in database' });
 					}
 				});
-		});
-
 	})
 
-	app.post('/webhook', (error, request) => {
-		if (error) {
-			//console.error(error);
-			return;
-		}
-		//console.log('Yah we got a webhook');
-		return res.status(200).send(request.body);
+  app.post('/webhook/createProduct', (req, res) => {
+    var myshopify_domain = req.headers['x-shopify-shop-domain'];
+    var webhook_topic = req.headers['x-shopify-topic'];
+    console.log(req.body);
+    console.log('Yah we got a webhook for create product');
+    //console.log(request.body);
+    return res.status(200).send('OK');
 	});
 
-	app.post('/webhook/removeSaleschannel', (error, request) => {
-		if (error) {
-			console.error(error);
-			return;
-		}
-		console.log('Yah we got a webhook In progress');
-		console.log(request.body);
-		console.log(request.body.id);
-		var sql = "DELETE FROM tbl_merchant WHERE ShopID = " + request.body.id;
+  app.post('/webhook/deleteProduct', (req, res) => {
+    var myshopify_domain = req.headers['x-shopify-shop-domain'];
+    console.log(req.body);
+    console.log('Yah we got a webhook for delete product');
+    //console.log(request.body);
+    return res.status(200).send('OK');
+  });
+
+  app.post('/webhook/removeSaleschannel', (req, res) => {
+    console.log('Yah we got a webhook for remove Saleschannel');
+    console.log(req.body);
+    var sql = "DELETE FROM tbl_merchant WHERE ShopID = "+req.body.id;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_merchant: " + result.affectedRows);
 		});
-		var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = " + request.body.id;
+    var sql = "DELETE FROM tbl_merchant_shop WHERE ShopID = "+req.body.id;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_merchant_shop: " + result.affectedRows);
 		});
-		var shopify_domain = request.body.myshopify_domain;
+    var shopify_domain = req.body.myshopify_domain;
 		var shopName = shopify_domain.replace('.myshopify.com', '');
 		var sql = "DELETE FROM tbl_shop_products WHERE ShopName = " + shopName;
 		connection.query(sql, function (err, result) {
 			if (err) throw err;
 			console.log("Number of records deleted from tbl_shop_products: " + result.affectedRows);
 		});
-		return res.status(200).send(request.body);
+    return res.status(200).send('OK');
 	});
 
-	app.post('/webhook/customers/redact', (error, request) => {
-		if (error) {
-			console.error(error);
-			return;
-		}
-
+  app.post('/webhook/customers/redact', (req, res) => {
+    console.log(req.body);
 		console.log('Yah we got a webhook for customers/redact');
 
-		return res.status(200).send(request.body);
+    return res.status(200).send('OK');
 	});
 
-	app.post('/webhook/shop/redact', (error, request) => {
-		if (error) {
-			console.error(error);
-			return;
-		}
-
+  app.post('/webhook/shop/redact', (req, res) => {
+    console.log(req.body);
 		console.log('Yah we got a webhook for shop/redact');
 
-		return res.status(200).send(request.body);
+    return res.status(200).send('OK');
 	});
 
 	app.get('/shopify', (req, res) => {
@@ -176,8 +184,9 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 		const shop = req.query.shop;
 		if (shop) {
 			const state = nonce();
+      console.log(state);
 			const redirectUri = HOSTNAME + '/shopify/callback';
-			const installUrl = 'https://' + shop + '.myshopify.com' +
+      const installUrl = 'https://' + shop +
 				'/admin/oauth/authorize?client_id=' + APIKEY +
 				'&scope=' + scopes +
 				'&state=' + state +
@@ -195,11 +204,11 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 	app.get('/shopify/callback', (req, res) => {
 		// EX. shop will be ipsteststore.myshopify.com here
 		const { shop, hmac, code, state } = req.query;
-		const stateCookie = cookie.parse(req.headers.cookie).state;
+   // const stateCookie = cookie.parse(req.headers.cookie).state;
 
-		if (state !== stateCookie) {
+    /*if (state !== stateCookie) {
 			return res.status(403).send('Request origin cannot be verified');
-		}
+    }*/
 
 		if (shop && hmac && code) {
 			// DONE: Validate request is from Shopify
@@ -337,7 +346,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					webhook:
 					{
 						topic: 'products/create',
-						address: 'https://affiliate.flat-lay.com/webhook',
+              address: 'https://affiliate.flat-lay.com/webhook/createProduct',
 						format: 'json'
 					}
 				},
@@ -363,7 +372,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					webhook:
 					{
 						topic: 'products/delete',
-						address: 'https://affiliate.flat-lay.com/webhook',
+              address: 'https://affiliate.flat-lay.com/webhook/deleteProduct',
 						format: 'json'
 					}
 				},
