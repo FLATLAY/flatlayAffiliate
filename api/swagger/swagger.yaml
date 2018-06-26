@@ -1140,7 +1140,8 @@ definitions:
       client:
         type: "string"
       budget:
-        type: "string"
+        type: "integer"
+        format: "int32"
       startdate:
         type: "string"
       enddate:
@@ -1150,6 +1151,42 @@ definitions:
       instagram:
         type: "string"
       twitter:
-        type: "string"
+        type: "boolean"
       tumblr:
+        type: "boolean"
+  StripeSignup:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      password:
+        type: "string"
+      plan:
+        type: "string"
+      profile:
+        type: "object"
+        properties:
+          name:
+            type: "object"
+            properties:
+              first:
+                type: "string"
+              last:
+                type: "string"
+  ChangeSubscription:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+      newPlan:
+        type: "string"
+  CancelSubscription:
+    type: "object"
+    properties:
+      userId:
+        type: "string"
+  UpdatePayment:
+    type: "object"
+    properties:
+      tokenId:
         type: "string"

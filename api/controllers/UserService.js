@@ -13,7 +13,6 @@ var express = require('express'),
     path = require('path'),
     url = require('url'),
     async = require('async');
-const connection = require('../../config.js');
 var app = express();
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
@@ -26,7 +25,7 @@ if (HOSTNAME.indexOf('https') != -1) {
 } else {
 	var http = require('http');
 }
-
+import connection from '../../config';
 import signupWithStripe from './SignupWithStripe';
 import handleChangeSubscription from './SubscriptionChange';
 import handleCancelSubscription from './SubscriptionCancel';
