@@ -24,6 +24,9 @@ if (HOSTNAME.indexOf('https') != -1) {
 }
 
 import signupWithStripe from './SignupWithStripe';
+import handleChangeSubscription from './handleChangeSubscription';
+import handleCancelSubscription from './handleCancelSubscription';
+import handleUpdatePayment from './Payment';
 
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -1621,6 +1624,24 @@ exports.viewClients = function (args, res, next) {
 
 exports.handleSignup = function (args, res, next) {
 	return signupWithStripe(args).then(result => {
+		res.status(200).send(JSON.stringify(result));
+	}).catch(err => res.status(400).send(err));
+}
+
+exports.handleChangeSubscription = function (args, res, next) {
+	return handleChangeSubscription(args).then(result => {
+		res.status(200).send(JSON.stringify(result));
+	}).catch(err => res.status(400).send(err));
+}
+
+exports.handleCancelSubscription = function (args, res, next) {
+	return handleCancelSubscription(args).then(result => {
+		res.status(200).send(JSON.stringify(result));
+	}).catch(err => res.status(400).send(err));
+}
+
+exports.handleUpdatePayment = function (args, res, next) {
+	return handleUpdatePayment(args).then(result => {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
 }

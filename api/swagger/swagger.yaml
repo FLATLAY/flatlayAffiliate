@@ -780,7 +780,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "SignupWithStripe"
+      x-swagger-router-controller: "UserService"
   /changeSubscription:
     post:
       tags:
@@ -801,7 +801,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "SubscriptionChange"
+      x-swagger-router-controller: "UserService"
   /cancelSubscription:
     post:
       tags:
@@ -822,7 +822,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "SubscriptionCancel"
+      x-swagger-router-controller: "UserService"
   /updatePayment:
     put:
       tags:
@@ -843,7 +843,7 @@ paths:
       responses:
         200:
           description: "OK"
-      x-swagger-router-controller: "Payment"
+      x-swagger-router-controller: "UserService"
 
 
   /swagger:

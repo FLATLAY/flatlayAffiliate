@@ -147,6 +147,18 @@ module.exports.viewClients = function viewClients(req, res, next) {
 
 module.exports.handleSignup = function handleSignup(req, res, next) {
 	User.handleSignup(req.swagger.params, res, next);
-}
+};
+
+module.exports.handleChangeSubscription = function handleChangeSubscription(req, res, next) {
+	User.handleChangeSubscription(req.swagger.params, res, next);
+};
+
+module.exports.handleCancelSubscription = function handleCancelSubscription(req, res, next) {
+	User.handleCancelSubscription(req.swagger.params, res, next);
+};
+
+module.exports.handleUpdatePayment = function handleUpdatePayment(req, res, next) {
+	User.handleUpdatePayment(req.swagger.params, res, next);
+};
 
 module.exports = routes;
