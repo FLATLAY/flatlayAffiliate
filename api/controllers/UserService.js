@@ -23,6 +23,8 @@ if (HOSTNAME.indexOf('https') != -1) {
 	var http = require('http');
 }
 
+import signupWithStripe from './SignupWithStripe';
+
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
@@ -1615,4 +1617,10 @@ exports.viewClients = function (args, res, next) {
 
 		});
 
+}
+
+exports.handleSignup = function (args, res, next) {
+	return signupWithStripe(args).then(result => {
+		res.status(200).send(JSON.stringify(result));
+	}).catch(err => res.status(400).send(err));
 }
