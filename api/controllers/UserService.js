@@ -711,56 +711,6 @@ exports.getShopDataByShopName = function (args, res, next) {
 }
 
 exports.getMerchantData = function (args, res, next) {
-  var response = {};
-  var merchantID = /[^/]*$/.exec(args.url)[0];
-  async.waterfall([
-       getPersonalData.bind(null,merchantID),
-       getBillingData,
-       getSocialChannels
-       
-   ], function (err, result) {
-       //connection.end();
-       console.log("Error in waterfall");
-       console.log(err);
-       //callback(err, result);
-   });
-  
-  function getPersonalData(merchantID,callback){
-    connection.query('SELECT * from tbl_merchant where MerchantID = ?', merchantID, function(err,result,fields){
-        if(!err){
-          if(result.length > 0){
-              console.log(response.data);
-                response.data = result[0];
-                response.result = 'success';
-                callback(null,result);
-          }else{
-            response.result = 'error';
-            response.data = 'Merchant not found';
-            res.setHeader('Content-Type', 'application/json');
-            res.setHeader('Access-Control-Allow-Origin', '*');
-			res.status(400).send(JSON.stringify(response));
-		}
-        }else{
-          res.setHeader('Content-Type', 'application/json');
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          res.status(404).send(JSON.stringify(err));
-        }
-	});
-  }
-
-  function getBillingData(result,callback){
-    connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?',merchantID, function(err,billingresult,fields){
-      if(!err && billingresult.length > 0){
-         response.data.billing = billingresult[0];
-         callback(null,billingresult);
-      }else{
-        callback(null,err);
-}
-    });
-    
-  }
-
-exports.getMerchantData = function (args, res, next) {
 	var response = {};
 	var merchantID = /[^/]*$/.exec(args.url)[0];
 	async.waterfall([
