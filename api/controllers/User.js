@@ -73,6 +73,10 @@ module.exports.getShopDataByShopName = function getShopDataByShopName(req, res, 
 	User.getShopDataByShopName(req.swagger.params, res, next);
 };
 
+module.exports.getMerchantData = function getMerchantData (req, res, next) {
+  User.getMerchantData(req.swagger.params, res, next);
+};
+
 module.exports.addProduct = function addProduct(req, res, next) {
 	User.addProduct(req.swagger.params, res, next);
 };
@@ -131,6 +135,10 @@ module.exports.addstripecard = function addstripecard(req, res, next) {
 
 module.exports.saveBillingInfo = function saveBillingInfo(req, res, next) {
 	User.saveBillingInfo(req.swagger.params, res, next);
+};
+
+module.exports.updateSocialChannels = function updateSocialChannels (req, res, next) {
+  User.updateSocialChannels(req.swagger.params, res, next);
 };
 
 module.exports.createCampaign = function createCampaign(req, res, next) {

@@ -8,8 +8,11 @@ var express = require('express'),
 	session = require('express-session'),
 	nodemailer = require('nodemailer'),
 	https = require('https'),
-	request = require('request-promise');
-const connection = require('../../config.js');
+    request = require('request-promise'),
+    fs = require('fs'),
+    path = require('path'),
+    url = require('url'),
+    async = require('async');
 var app = express();
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
@@ -22,7 +25,7 @@ if (HOSTNAME.indexOf('https') != -1) {
 } else {
 	var http = require('http');
 }
-
+import connection from '../../config';
 import signupWithStripe from './SignupWithStripe';
 import handleChangeSubscription from './SubscriptionChange';
 import handleCancelSubscription from './SubscriptionCancel';
@@ -669,28 +672,93 @@ exports.getAccessToken = function (args, res, next) {
 }
 
 exports.getShopDataByShopName = function (args, res, next) {
-
 	var response = {};
 	// Get access token from database by shop name and display
 	var shop = /[^/]*$/.exec(args.url)[0];
 	connection.query('SELECT * from tbl_merchant where ShopName = ?', shop, function (err, result, fields) {
-		if (!err && result.length > 0) {
+    if(!err){
+      if(result.length > 0){
+        connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', result[0].MerchantID, function(err,billingresult,fields){
+          if(!err && billingresult.length > 0){
 			response.result = 'success';
 			response.data = result[0];
+            response.data.billing =billingresult[0];
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
 			res.status(200).send(JSON.stringify(response));
 		} else {
+            response.result = 'success';
+            response.data = result[0];
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.status(200).send(JSON.stringify(response));
+          }
+        });
+      }else{
 			response.result = 'error';
 			response.data = 'Shop not found or Invalid shop name';
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
-			res.status(400).send(JSON.stringify(response));
-		}
-	});
+        res.status(200).send(JSON.stringify(response));
+      }
+    }else{
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.status(400).send(JSON.stringify(err));
+    }
+  });
 
 }
-var storedProductIDs = [];
+
+exports.getMerchantData = function (args, res, next) {
+  var response = {};
+  var merchantID = /[^/]*$/.exec(args.url)[0];
+  async.waterfall([
+       getPersonalData.bind(null,merchantID),
+       getBillingData,
+       getSocialChannels
+       
+   ], function (err, result) {
+       //connection.end();
+       console.log("Error in waterfall");
+       console.log(err);
+       //callback(err, result);
+   });
+  
+  function getPersonalData(merchantID,callback){
+    connection.query('SELECT * from tbl_merchant where MerchantID = ?', merchantID, function(err,result,fields){
+        if(!err){
+          if(result.length > 0){
+              console.log(response.data);
+                response.data = result[0];
+                response.result = 'success';
+                callback(null,result);
+          }else{
+            response.result = 'error';
+            response.data = 'Merchant not found';
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Access-Control-Allow-Origin', '*');
+			res.status(400).send(JSON.stringify(response));
+		}
+        }else{
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.status(404).send(JSON.stringify(err));
+        }
+	});
+  }
+
+  function getBillingData(result,callback){
+    connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?',merchantID, function(err,billingresult,fields){
+      if(!err && billingresult.length > 0){
+         response.data.billing = billingresult[0];
+         callback(null,billingresult);
+      }else{
+        callback(null,err);
+}
+    });
+    
+  }
 
 exports.getMerchantData = function (args, res, next) {
 	var response = {};
@@ -1028,7 +1096,7 @@ exports.productListCount = function (args, res1, next) {
 			var chunkObj = JSON.parse(chunk);
 			if (chunkObj.result == 'success') {
 				console.log(chunkObj.accessToken);
-				const shopRequestUrl = 'https://' + shop + '/admin/products/count.json?published_status=published';
+        const shopRequestUrl = 'https://' + shop + '/admin/product_listings/count.json';
 				const shopRequestHeaders = {
 					'X-Shopify-Access-Token': chunkObj.accessToken,
 				};
@@ -1511,6 +1579,7 @@ exports.saveBillingInfo = function (args, res, next) {
 
 
 	) {
+    console.log(args.body);
 		var merchantID = args.body.merchantID,
 			cardholderName = args.body.cardholderName,
 			cardholderNumber = args.body.cardholderNumber,
@@ -1561,6 +1630,7 @@ exports.saveBillingInfo = function (args, res, next) {
 	console.log('Hola User');
 	//res.end();
 }
+
 
 exports.updateSocialChannels = function (args, res, next) {
 	/**
@@ -1664,6 +1734,23 @@ exports.createCampaign = function (args, res, next) {
 			twitter = args.body.twitter,
 			tumblr = args.body.tumblr;
 
+      var responsebody = {
+        "username": username, 
+        "title": title,  
+        "briefdescription": briefdescription, 
+        "fullbrief": fullbrief, 
+        "client": client, 
+        "budget": budget,
+        "daterange": {  
+          "startdate": startdate, 
+          "enddate": enddate
+        },
+        "facebook": facebook, 
+        "instagram": instagram, 
+        "twitter": twitter, 
+        "tumblr": tumblr
+      };
+
 		// args.getConnection(function (err, connection) {
 		connection.query('INSERT INTO tbl_campaigns (username, title, timestamp, briefdescription, fullbrief, client, budget, startdate, enddate, facebook, instagram, twitter, tumblr)\
        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
@@ -1671,7 +1758,7 @@ exports.createCampaign = function (args, res, next) {
 			function (err, result) {
 				if (!err) {
 					if (result.affectedRows != 0) {
-						response.push({ 'result': 'success', 'data': result });
+            response.push({'result' : 'success', "body": responsebody, "campaignid": result.insertId});
 					}
 					else {
 						response.push({ 'msg': 'No result found' });
@@ -1749,6 +1836,7 @@ exports.viewClients = function (args, res, next) {
 		});
 
 }
+
 
 exports.handleSignup = function (args, res, next) {
 	return signupWithStripe(args).then(result => {
