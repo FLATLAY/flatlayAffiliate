@@ -1,4 +1,4 @@
-import mysql from 'mysql';
+import connection from './config';
 
 export class Database {
     constructor() {

@@ -1,6 +1,6 @@
-var mysql = require('mysql');
+import mysql from 'mysql';
 
-global.connection = mysql.createConnection({
+const connection = mysql.createConnection({
 	host: '127.0.0.1',
 	user: 'root',
 	password: 'password',
@@ -14,4 +14,4 @@ try {
 	console.log('Database Connetion failed (from config.js):' + e);
 }
 
-module.exports = connection;
+export default connection;
