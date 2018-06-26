@@ -13,7 +13,6 @@ var reload = require('reload');
 var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
-
 var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
