@@ -792,6 +792,7 @@ paths:
           description: "Successful"
           schema:
             $ref: "#/definitions/Campaign"
+      x-swagger-router-controller: "UserService"
   /user/viewClients/{username}:
     get:
       tags:
@@ -812,6 +813,7 @@ paths:
           description: "Successful"
           schema:
             $ref: "#/definitions/Campaign"
+      x-swagger-router-controller: "UserService"
   /signupWithStripe:
     post:
       tags:
