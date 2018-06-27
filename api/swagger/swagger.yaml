@@ -89,6 +89,39 @@ paths:
         default:
           description: "successful operation"
       x-swagger-router-controller: "UserService"
+  /updateQuestionnaire/{MerchantID}:
+    post:
+      tags:
+      - "merchant"
+      summary: "Update Questionnaire"
+      description: "Update Questionnaire for merchant"
+      operationId: "updateQuestionnaire"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Update merchant Questionnaire object"
+        required: true
+        schema:
+          $ref: "#/definitions/updateQuestionnaire"
+      - name: "MerchantID"
+        in: "path"
+        description: "The MerchantID for which needs to update Questionnaire"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "Success"
+        400:
+          description: "Bad Syntax/ Invalid data"
+        500:
+          description: "Internal server error"
+        default:
+          description: "successful operation"
+      x-swagger-router-controller: "UserService"
   /connectAccount/{SHOP}:
     get:
       tags:
@@ -955,6 +988,19 @@ definitions:
         type: "string"
     xml:
       name: "User"
+  updateQuestionnaire:
+    type: "object"
+    properties:
+      productID:
+        type: "integer"
+        format: "int32"
+      priceSegmentID:
+        type: "integer"
+        format: "int32"
+      targetAudience:
+        type: "string"
+      category:
+        $ref: "#/definitions/Category"
   Billing:
     type: "object"
     properties:

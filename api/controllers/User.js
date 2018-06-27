@@ -21,6 +21,10 @@ module.exports.updateMerchant = function updateMerchant(req, res, next) {
 	User.updateMerchant(req.swagger.params, res, next);
 };
 
+module.exports.updateQuestionnaire = function updateQuestionnaire(req, res, next) {
+	User.updateQuestionnaire(req.swagger.params, res, next);
+};
+
 module.exports.connectAccount = function connectAccount(req, res, next) {
 	User.connectAccount(req.swagger.params, res, next);
 };

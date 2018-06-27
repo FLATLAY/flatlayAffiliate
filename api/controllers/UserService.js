@@ -126,6 +126,7 @@ function insertNewMerchant(data, res) {
 				}
 				response.result = 'success';
 				response.msg = 'New merchant created';
+				response.merchantID = insertMerchantID;
 				res.setHeader('Content-Type', 'application/json');
 				return res.status(200).send(JSON.stringify(response));
 			} else {
@@ -316,6 +317,80 @@ exports.updateMerchant = function (args, res, next) {
 		response.msg = 'Please fill required details';
 		res.setHeader('Content-Type', 'application/json');
 		return res.status(200).send(JSON.stringify(response));
+	}
+
+}
+
+ exports.updateQuestionnaire = async function(args, res, next){
+	var response = {};
+	var MerchantID = /[^/]*$/.exec(args.url)[0];
+	let data = {...args.body};
+	delete data['category'];
+	data['updateDate'] = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+	var category = typeof args.body.category !== 'undefined' ? args.body.category:'',
+	UpdateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
+
+	async.series({
+	    one: function(callback) {
+	        setTimeout(function() {
+	        	callback(null, 1);
+	        	update_tbl_merchant();
+	        }, 200);
+	    },
+	    two: function(callback){
+	        setTimeout(function() {
+	        	callback(null, 2);
+	        	update_tbl_merchant_category(category);
+	        }, 100);
+	    }
+	}, function(err, results) {
+		if(!err){
+			console.log(results);
+			response.result = 'success';
+			res.setHeader('Content-Type', 'application/json');
+			return res.status(200).send(JSON.stringify(response));
+		}else{
+			console.log(err);
+			return res.status(400).send(err);
+		}
+	});
+
+	
+
+	function update_tbl_merchant(){
+		console.log(data);
+		connection.query('UPDATE tbl_merchant SET ? WHERE MerchantID = ' + MerchantID,
+		[data],
+		function (err, result) {
+			console.log(this.sql);
+			if (!err) {
+
+				console.log('UPDATE tbl_merchant');
+			}else{
+				console.log(err);
+			}
+			
+		});
+	}
+	function update_tbl_merchant_category(category){
+		if (category) {
+			var update_tbl_merchant_category = connection.query("DELETE FROM tbl_merchant_category WHERE MerchantID = " + MerchantID, function  (err, result) {
+				if (err) throw err;
+			});
+			for (var i = 0; i < category.length; i++) {
+				connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
+	           VALUES (?,?,?)',
+					[MerchantID, category[i], moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
+					function (err, result) {
+						console.log(this.sql);
+						if (!err) {
+							console.log(result);
+						} else {
+							console.log(err);
+						}
+					});
+			}
+		}
 	}
 
 }
@@ -715,24 +790,24 @@ exports.getMerchantData = function (args, res, next) {
 	var merchantID = /[^/]*$/.exec(args.url)[0];
 	async.waterfall([
 		getPersonalData.bind(null, merchantID),
+		getQuestionnaire,
 		getBillingData,
 		getSocialChannels
 
 	], function (err, result) {
-		//connection.end();
-		console.log("Error in waterfall");
-		console.log(err);
-		//callback(err, result);
+		response.result = 'success';
+		res.setHeader('Content-Type', 'application/json');
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.status(200).send(JSON.stringify(response));
 	});
 
 	function getPersonalData(merchantID, callback) {
 		connection.query('SELECT * from tbl_merchant where MerchantID = ?', merchantID, function (err, result, fields) {
 			if (!err) {
 				if (result.length > 0) {
-					console.log(response.data);
 					response.data = result[0];
 					response.result = 'success';
-					callback(null, result);
+					callback(null, response);
 				} else {
 					response.result = 'error';
 					response.data = 'Merchant not found';
@@ -748,28 +823,46 @@ exports.getMerchantData = function (args, res, next) {
 		});
 	}
 
-	function getBillingData(result, callback) {
-		connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', merchantID, function (err, billingresult, fields) {
-			if (!err && billingresult.length > 0) {
-				response.data.billing = billingresult[0];
-				callback(null, billingresult);
+	function getQuestionnaire(response, callback){
+		response.data.questionnaire = {
+			ProductID: response.data.ProductID,
+			PriceSegmentID: response.data.PriceSegmentID,
+			TargetAudience: response.data.TargetAudience
+		}
+		connection.query('SELECT * from tbl_merchant_category where MerchantID = ?', merchantID, function (err, categoryresult, fields) {
+			if (!err) {
+				if(categoryresult.length > 0) {
+					response.data.questionnaire.Category = categoryresult;
+				}
+				callback(null, response);
 			} else {
+				res.setHeader('Content-Type', 'application/json');
+				res.setHeader('Access-Control-Allow-Origin', '*');
+				res.status(404).send(JSON.stringify(err));
+			}
+		});
+	}
+
+	function getBillingData(response, callback) {
+		connection.query('SELECT * from tbl_merchant_billing where MerchantID = ?', merchantID, function (err, billingresult, fields) {
+			if (!err){
+				if(billingresult.length > 0) {
+					response.data.billing = billingresult[0];
+				}
+				callback(null, response);
+			}else {
 				callback(null, err);
 			}
 		});
 
 	}
 
-	function getSocialChannels() {
+	function getSocialChannels(response, callback) {
 		connection.query('SELECT * from tbl_channels where merchantID = ?', merchantID, function (err, channelsresult, fields) {
-			console.log(this.sql);
 			if (!err && channelsresult.length > 0) {
 				response.data.socialChannels = channelsresult[0];
-				response.result = 'success';
-				res.setHeader('Content-Type', 'application/json');
-				res.setHeader('Access-Control-Allow-Origin', '*');
-				res.status(200).send(JSON.stringify(response));
 			}
+			callback(null, response);
 
 		});
 	}
