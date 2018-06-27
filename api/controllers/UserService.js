@@ -1729,10 +1729,8 @@ exports.createCampaign = function (args, res, next) {
 
 exports.viewCampaigns = function (args, res, next) {
 	var response = [];
-	console.log(args.url);
 	var username = /[^/]*$/.exec(args.url)[0];
 	// var webUrl = args.url;
-	console.log("userID: ", userID);
 	// args.getConnection(function (err, connection) {
 	connection.query('SELECT * FROM tbl_campaigns where username=?',
 		[username],
@@ -1762,7 +1760,6 @@ exports.viewClients = function (args, res, next) {
 	console.log(args.url);
 	var username = /[^/]*$/.exec(args.url)[0];
 	// var webUrl = args.url;
-	console.log("userID: ", userID);
 	// args.getConnection(function (err, connection) {
 	connection.query('SELECT client FROM tbl_campaigns where username=?',
 		[username],
