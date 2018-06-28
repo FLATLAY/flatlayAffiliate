@@ -11,7 +11,8 @@ var reload = require('reload');
 var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
-var connection = require('./config.js');
+//var connection = require('./config.js');
+import connection from './config';
 var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
@@ -124,6 +125,30 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					}
 				});
 	})
+
+	// send file upload path in body
+	//return uploaded file path to save in DB
+	app.post('/imageupload', (req, res, next) => {
+		let response = {};
+		let uploadPath = req.body.uploadPath;
+		console.log(req.files.file);
+		if (!fs.existsSync(uploadPath)) {
+			fs.mkdirSync(uploadPath);
+		}
+    	let filename = req.files.file.name;
+		let imageFile = req.files.file;
+      	imageFile.mv(`${uploadPath}/${filename}`, function(err) {
+			if (err) {
+				res.status(400).send(err);
+			}else{
+				res.status(200).send({
+					status:'done',
+					url:HOSTNAME+'/'+`${uploadPath}/${filename}`,
+					filePath: `${uploadPath}/${filename}` 
+				});
+			}
+      	});
+    });
 
   app.post('/webhook/createProduct', (req, res) => {
     var myshopify_domain = req.headers['x-shopify-shop-domain'];
