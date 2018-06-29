@@ -1784,6 +1784,104 @@ exports.viewClients = function (args, res, next) {
 
 }
 
+exports.getCampaignProducts = function (args, res, next) {
+	var response = {};
+	var campaignid = args.swagger.params.campaignid.value;
+	connection.query('SELECT SP.*,SPI.* FROM tbl_campaigns_products as CP JOIN tbl_shop_products as SP ON SP.ProductID = CP.productid JOIN tbl_shop_products_images as SPI ON SPI.ProductID = CP.productid WHERE campaignid = ?',
+		[campaignid],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					result.forEach(function(product,index){
+					  console.log(result[index]);
+					  result[index]['id'] = product.ProductID;
+					  result[index]['title'] = product.ProductTitle;
+					  result[index]['image'] = {src: product.ImageSrc };
+					});
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+	
+}
+
+exports.addCampaignProduct = function (args, res, next) {
+	var response = {};
+	var data = {
+		campaignid:args.body.campaignid,
+		productIds: args.body.productids,
+	}
+	var campaignid = args.body.campaignid;
+	var productids = args.body.productids;
+	var records = productids.map(function(productid) {
+		return [campaignid,productid];
+	});
+	console.log(records);
+	
+	// args.getConnection(function (err, connection) {
+	connection.query('INSERT INTO tbl_campaigns_products (campaignid, productid) VALUES ?',
+		[records],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+	
+}
+
+exports.removeCampaignProduct = function (args, res, next) {
+	var response = {};
+	var campaignid = args.body.campaignid;
+	var productids = args.body.productids;
+	console.log(records);
+	var records = productids.map(function(productid) {
+		return [campaignid,productid];
+	});
+	// args.getConnection(function (err, connection) {
+	connection.query('DELETE FROM tbl_campaigns_products WHERE (campaignid, productid) IN (?)',
+		[records],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+	
+}
+
 exports.getCampaignHeroImages = function (args, res, next) {
 	//view clients associated with merchant account
 	var response = {};
