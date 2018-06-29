@@ -1,9 +1,8 @@
-import mysql from 'mysql';
-
+var mysql = require('mysql');
 const connection = mysql.createConnection({
-	host: '127.0.0.1',
+	host: 'localhost',
 	user: 'root',
-	password: '',
+	password: 'idea!23',
 	database: 'flatlay_affiliate'
 });
 try {

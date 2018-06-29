@@ -95,7 +95,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 		if (!fs.existsSync(filePath)) {
 			fs.mkdirSync(filePath);
 		}
-    var filename = req.body.shopname;
+    var filename = req.body.merchantID;
     if(typeof req.body.fileURL !== 'undefined'){
       let URL_TO_REQUEST  = req.body.fileURL;
       filename += path.extname(URL_TO_REQUEST);
