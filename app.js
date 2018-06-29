@@ -90,7 +90,7 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   // upload given file in floder
 	app.post('/upload/profilepicture', (req, res, next) => {
-    
+    var merchantID = req.body.merchantID;
     let filePath = `public/profile-images`;
 		if (!fs.existsSync(filePath)) {
 			fs.mkdirSync(filePath);
@@ -112,11 +112,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       });
     }
     
-			var shopname = req.body.shopname,
     profileImage = `/public/profile-images/${filename}`,
 				updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
-				[profileImage, updateDate, req.body.shopname],
+			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE MerchantID = ?',
+				[profileImage, updateDate, merchantID],
 				function (err, result) {
 					if (!err) {
 						res.json({ result: 'success' });
