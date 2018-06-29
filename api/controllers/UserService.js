@@ -1784,6 +1784,97 @@ exports.viewClients = function (args, res, next) {
 
 }
 
+exports.getCampaignHeroImages = function (args, res, next) {
+	//view clients associated with merchant account
+	var response = {};
+	var campaignid = /[^/]*$/.exec(args.url)[0];
+	// var webUrl = args.url;
+	// args.getConnection(function (err, connection) {
+	connection.query('SELECT * from tbl_campaigns_hero_images where campaignid = ?',
+		[campaignid],
+		function (err, result) {
+			if (!err) {
+				if (result.length > 0) {
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+
+}
+
+exports.addCampaignHeroImage = function (args, res, next) {
+	//view clients associated with merchant account
+	var response = [];
+	var data = {
+		campaignid:args.body.campaignid,
+		uid: args.body.uid,
+		url: args.body.url,
+		name: args.body.name
+	}
+	console.log(data);
+	// var webUrl = args.url;
+	// args.getConnection(function (err, connection) {
+	connection.query('INSERT INTO tbl_campaigns_hero_images SET ?',
+		[data],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					response.push({ 'result': result });
+					console.log("noerr", result);
+				}
+				else {
+					response.push({ 'msg': 'No result found' });
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+
+}
+
+exports.removeCampaignHeroImage = function (args, res, next) {
+	//view clients associated with merchant account
+	var response = [];
+	var campaignid = args.body.campaignid,
+		uid = args.body.uid;
+	
+	// var webUrl = args.url;
+	// args.getConnection(function (err, connection) {
+	connection.query('DELETE from tbl_campaigns_hero_images where campaignid = ? AND uid = ?',
+		[campaignid,uid],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					response.push({ 'result': result });
+					console.log("noerr", result);
+				}
+				else {
+					response.push({ 'msg': 'No result found' });
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+
+}
 
 exports.handleSignup = function (args, res, next) {
 	return signupWithStripe(args).then(result => {

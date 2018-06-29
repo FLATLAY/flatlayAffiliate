@@ -814,6 +814,66 @@ paths:
           schema:
             $ref: "#/definitions/Campaign"
       x-swagger-router-controller: "UserService"
+  /user/campaign/heroimages/{campaignid}:
+    get:
+      tags:
+      - "user"
+      summary: "Get campaign heroimages"
+      description: "Get campaign heroimages"
+      operationId: "getCampaignHeroImages"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "campaignid"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int32"
+      responses:
+        200:
+          description: "Successful"
+      x-swagger-router-controller: "UserService"
+  /user/campaign/addheroimage:
+    post:
+      tags:
+      - "user"
+      summary: "Add hero images"
+      description: "Add hero images"
+      operationId: "addCampaignHeroImage"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/addCampaignHeroImage"
+      responses:
+        200:
+          description: "Successful"
+      x-swagger-router-controller: "UserService"
+  /user/campaign/removeheroimage:
+    post:
+      tags:
+      - "user"
+      summary: "Remove hero images"
+      description: "Remove hero images"
+      operationId: "removeCampaignHeroImage"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/removeCampaignHeroImage"
+      responses:
+        200:
+          description: "Successful"
+      x-swagger-router-controller: "UserService"
   /signupWithStripe:
     post:
       tags:
@@ -1191,4 +1251,22 @@ definitions:
     type: "object"
     properties:
       tokenId:
+        type: "string"
+  addCampaignHeroImage:
+    type: "object"
+    properties:
+      campaignid:
+        type: "string"
+      uid:
+        type: "string"
+      url:
+        type: "string"
+      name:
+        type: "string"
+  removeCampaignHeroImage:
+    type: "object"
+    properties:
+      campaignid:
+        type: "string"
+      uid:
         type: "string"

@@ -153,6 +153,18 @@ module.exports.viewClients = function viewClients(req, res, next) {
 	User.viewClients(req.swagger.params, res, next);
 };
 
+module.exports.getCampaignHeroImages = function getCampaignHeroImages(req, res, next) {
+	User.getCampaignHeroImages(req.swagger.params, res, next);
+};
+
+module.exports.addCampaignHeroImage = function addCampaignHeroImage(req, res, next) {
+	User.addCampaignHeroImage(req.swagger.params, res, next);
+};
+
+module.exports.removeCampaignHeroImage = function removeCampaignHeroImage(req, res, next) {
+	User.removeCampaignHeroImage(req.swagger.params, res, next);
+};
+
 module.exports.handleSignup = function handleSignup(req, res, next) {
 	User.handleSignup(req.swagger.params, res, next);
 };

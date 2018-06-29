@@ -11,7 +11,8 @@ var reload = require('reload');
 var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
-var connection = require('./config.js');
+//var connection = require('./config.js');
+import connection from './config';
 var url = require('url');
 var cors = require('cors');
 var moment = require('moment');
@@ -89,12 +90,12 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   // upload given file in floder
 	app.post('/upload/profilepicture', (req, res, next) => {
-    
+    var merchantID = req.body.merchantID;
     let filePath = `public/profile-images`;
 		if (!fs.existsSync(filePath)) {
 			fs.mkdirSync(filePath);
 		}
-    var filename = req.body.shopname;
+    var filename = req.body.merchantID;
     if(typeof req.body.fileURL !== 'undefined'){
       let URL_TO_REQUEST  = req.body.fileURL;
       filename += path.extname(URL_TO_REQUEST);
@@ -111,11 +112,10 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
       });
     }
     
-			var shopname = req.body.shopname,
     profileImage = `/public/profile-images/${filename}`,
 				updateDate = moment(Date.now()).format('YYYY-MM-DD HH:mm:ss');
-			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE ShopName = ?',
-				[profileImage, updateDate, req.body.shopname],
+			connection.query('UPDATE tbl_merchant SET ProfileImage =?,UpdateDate = ? WHERE MerchantID = ?',
+				[profileImage, updateDate, merchantID],
 				function (err, result) {
 					if (!err) {
 						res.json({ result: 'success' });
@@ -124,6 +124,30 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 					}
 				});
 	})
+
+	// send file upload path in body
+	//return uploaded file path to save in DB
+	app.post('/imageupload', (req, res, next) => {
+		let response = {};
+		let uploadPath = req.body.uploadPath;
+		console.log(req.files.file);
+		if (!fs.existsSync(uploadPath)) {
+			fs.mkdirSync(uploadPath);
+		}
+    	let filename = req.files.file.name;
+		let imageFile = req.files.file;
+      	imageFile.mv(`${uploadPath}/${filename}`, function(err) {
+			if (err) {
+				res.status(400).send(err);
+			}else{
+				res.status(200).send({
+					status:'done',
+					url:HOSTNAME+'/'+`${uploadPath}/${filename}`,
+					filePath: `${uploadPath}/${filename}` 
+				});
+			}
+      	});
+    });
 
   app.post('/webhook/createProduct', (req, res) => {
     var myshopify_domain = req.headers['x-shopify-shop-domain'];
