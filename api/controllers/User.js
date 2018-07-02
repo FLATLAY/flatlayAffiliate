@@ -153,6 +153,18 @@ module.exports.viewClients = function viewClients(req, res, next) {
 	User.viewClients(req.swagger.params, res, next);
 };
 
+module.exports.getCampaignProducts = function getCampaignProducts(req, res, next) {
+	User.getCampaignProducts(req.swagger.params, res, next);
+};
+
+module.exports.addCampaignProduct = function addCampaignProduct(req, res, next) {
+	User.addCampaignProduct(req.swagger.params, res, next);
+};
+
+module.exports.removeCampaignProduct = function removeCampaignProduct(req, res, next) {
+	User.removeCampaignProduct(req.swagger.params, res, next);
+};
+
 module.exports.getCampaignHeroImages = function getCampaignHeroImages(req, res, next) {
 	User.getCampaignHeroImages(req.swagger.params, res, next);
 };

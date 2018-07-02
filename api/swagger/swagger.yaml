@@ -438,7 +438,7 @@ paths:
         404:
           description: "Shop not found"
       x-swagger-router-controller: "UserService"
-  /getMerchantData/{MerchantID}:
+  /getMerchantData/{merchantID}:
     get:
       tags:
       - "merchant"
@@ -449,7 +449,7 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
-      - name: "MerchantID"
+      - name: "merchantID"
         in: "path"
         description: "The MerchantID for which needs to retrive data"
         required: true
@@ -479,6 +479,10 @@ paths:
         description: "Shop name to query and retrieve product list"
         required: true
         type: "string"
+      - in: "query"
+        name: "title"
+        type: "string"
+        description: "The value to filter products by title"
       responses:
         200:
           description: "Successful operation"
@@ -813,6 +817,69 @@ paths:
           description: "Successful"
           schema:
             $ref: "#/definitions/Campaign"
+      x-swagger-router-controller: "UserService"
+  /user/campaign/{campaignid}/products:
+    get:
+      tags:
+      - "user"
+      summary: "Fetch products of given campaign id"
+      description: "Fetch products of given campaign id"
+      operationId: "getCampaignProducts"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "campaignid"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "title"
+        in: "query"
+        description: "The title of product to filter in products list"
+        type: "string"
+      responses:
+        200:
+          description: "Successful"
+      x-swagger-router-controller: "UserService"
+  /user/campaign/addproduct:
+    post:
+      tags:
+      - "user"
+      summary: "Add product for campaign"
+      description: "Add product for campaign"
+      operationId: "addCampaignProduct"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/addCampaignProduct"
+      responses:
+        200:
+          description: "Successful"
+      x-swagger-router-controller: "UserService"
+  /user/campaign/removeproduct:
+    post:
+      tags:
+      - "user"
+      summary: "Remove product for campaign"
+      description: "Remove product for campaign"
+      operationId: "removeCampaignProduct"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/addCampaignProduct"
+      responses:
+        200:
+          description: "Successful"
       x-swagger-router-controller: "UserService"
   /user/campaign/heroimages/{campaignid}:
     get:
@@ -1252,6 +1319,15 @@ definitions:
     properties:
       tokenId:
         type: "string"
+  addCampaignProduct:
+    type: "object"
+    properties:
+      campaignid:
+        type: "string"
+      productids:
+        type: "array"
+        items:
+          type: integer
   addCampaignHeroImage:
     type: "object"
     properties:

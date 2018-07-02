@@ -712,17 +712,21 @@ exports.getShopDataByShopName = function (args, res, next) {
 
 exports.getMerchantData = function (args, res, next) {
 	var response = {};
-	var merchantID = /[^/]*$/.exec(args.url)[0];
+	var merchantID = args.swagger.params.merchantID.value;
 	async.waterfall([
 		getPersonalData.bind(null, merchantID),
 		getBillingData,
 		getSocialChannels
 
 	], function (err, result) {
-		//connection.end();
-		console.log("Error in waterfall");
-		console.log(err);
-		//callback(err, result);
+		if(!err){
+			response.result = 'success';
+			res.setHeader('Content-Type', 'application/json');
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			res.status(200).send(JSON.stringify(response));
+		}else{
+			res.status(400).send(JSON.stringify(err));
+		}
 	});
 
 	function getPersonalData(merchantID, callback) {
@@ -757,20 +761,17 @@ exports.getMerchantData = function (args, res, next) {
 				callback(null, err);
 			}
 		});
-
 	}
 
-	function getSocialChannels() {
+	function getSocialChannels(result, callback) {
 		connection.query('SELECT * from tbl_channels where merchantID = ?', merchantID, function (err, channelsresult, fields) {
 			console.log(this.sql);
 			if (!err && channelsresult.length > 0) {
 				response.data.socialChannels = channelsresult[0];
-				response.result = 'success';
-				res.setHeader('Content-Type', 'application/json');
-				res.setHeader('Access-Control-Allow-Origin', '*');
-				res.status(200).send(JSON.stringify(response));
+				callback(null, response);
+			}else{
+				callback(null, response);
 			}
-
 		});
 	}
 }
@@ -784,11 +785,13 @@ exports.productList = function (args, res, next) {
 	var response = {};
 	// GET to token page then make call to v1.flat-lay.com/externaltoken
 	//put token into request to shopify and return object
-	var shop = /[^/]*$/.exec(args.url)[0];
+	var shop = args.swagger.params.SHOP.value;
+	var searchTitle = args.swagger.params.title.value;
 	var response = {};
 	var shopName = shop;
 	var productIDs = [];
 	/* check exsiting products */
+
 	connection.query('SELECT ProductID from tbl_shop_products WHERE ShopName = ?', shopName,
 		function (err, result) {
 
@@ -802,7 +805,11 @@ exports.productList = function (args, res, next) {
 					res2.on('data', function (chunk) {
 						var chunkObj = JSON.parse(chunk);
 						if (chunkObj.result == 'success') {
-							const productRequestUrl = 'https://' + shop + '/admin/products.json?published_status=published';
+							var productQuerystring = "published_status=published";
+							if(searchTitle){
+								productQuerystring += "&title="+searchTitle;
+							}
+							const productRequestUrl = 'https://' + shop + '/admin/products.json?'+productQuerystring;
 							const productRequestHeaders = {
 								'X-Shopify-Access-Token': chunkObj.accessToken,
 							};
@@ -1782,6 +1789,163 @@ exports.viewClients = function (args, res, next) {
 
 		});
 
+}
+
+exports.getCampaignProducts = function (args, res, next) {
+	var response = {};
+	var campaignid = args.swagger.params.campaignid.value;
+	var searchTitle = args.swagger.params.title.value;
+	var where = 'CP.campaignid = ?';
+	if(searchTitle){
+		where += ' AND SP.ProductTitle like "%'+searchTitle+'%"';
+	}
+	connection.query('SELECT SP.*,SPI.*,CP.productid as campaign_productid FROM tbl_campaigns_products as CP LEFT JOIN tbl_shop_products as SP ON SP.ProductID = CP.productid LEFT JOIN tbl_shop_products_images as SPI ON SPI.ProductID = CP.productid WHERE '+ where +' GROUP BY CP.productid',
+		[campaignid],
+		function (err, result) {
+			console.log(this.sql);
+			if (!err) {
+				if (result.affectedRows != 0) {
+					result.forEach(function(product,index){
+					  console.log(result[index]);
+					  result[index]['id'] = product.campaign_productid;
+					  result[index]['title'] = product.ProductTitle;
+					  if(product.ImageSrc){
+					  	result[index]['image'] = {src: product.ImageSrc };
+					  }
+					  
+					});
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+	
+}
+
+exports.addCampaignProduct = async function (args, res, next) {
+	var response = {};
+	var data = {
+		campaignid:args.body.campaignid,
+		productIds: args.body.productids,
+	}
+	var campaignid = args.body.campaignid;
+	var productids = args.body.productids;
+	var exsitingProductIds = [];
+	async.waterfall([
+		removeDuplicate.bind(null),
+		insertCamapignProducts
+
+	], function (err, result) {
+		if(!err){
+			console.log(result);
+		}else{
+			res.status(400).send(err);
+		}
+	});
+
+	function removeDuplicate(callback) {
+		connection.query('Select productid from tbl_campaigns_products where campaignid = ?',
+		[campaignid],
+		function (err, result){
+			var records = null;
+			if(!err && result.length > 0){
+				result.map(function (id) {
+					exsitingProductIds.push(id.productid);
+				});
+				console.log(exsitingProductIds, productids);
+				
+				productids = productids.filter(x => !exsitingProductIds.includes(x));
+				
+				records = productids.map(function(productid) {
+						return [campaignid,productid];	
+
+				});
+				callback(null, records);
+				//console.log(exsitingProductIds);
+			}else{
+				records = productids.map(function(productid) {
+						return [campaignid,productid];	
+				});
+				callback(null, records);
+			}
+			
+		});
+		
+	}
+
+	function insertCamapignProducts(records, callback) {
+		if(records.length > 0){
+			connection.query('INSERT INTO tbl_campaigns_products (campaignid, productid) VALUES ?',
+			[records],
+			function (err, result) {
+				console.log(this.sql);
+				if (!err) {
+					if (result.affectedRows != 0) {
+						response.result = result;
+						console.log("noerr", result);
+					}
+					else {
+						response.msg = 'No result found';
+					}
+					res.setHeader('Content-Type', 'application/json');
+					res.status(200).send(JSON.stringify(response));
+				}
+				else {
+					console.log("elseerr", err);
+					res.status(400).send(err);
+				}
+			});
+		}else{
+			response.msg = 'Duplicate entry';
+			res.status(200).send(JSON.stringify(response));
+		}
+	}
+
+
+	
+	// args.getConnection(function (err, connection) {
+	
+	
+}
+
+exports.removeCampaignProduct = function (args, res, next) {
+	var response = {};
+	var campaignid = args.body.campaignid;
+	var productids = args.body.productids;
+	console.log(records);
+	var records = productids.map(function(productid) {
+		return [campaignid,productid];
+	});
+	// args.getConnection(function (err, connection) {
+	connection.query('DELETE FROM tbl_campaigns_products WHERE (campaignid, productid) IN (?)',
+		[records],
+		function (err, result) {
+			if (!err) {
+				if (result.affectedRows != 0) {
+					response.result = result;
+					console.log("noerr", result);
+				}
+				else {
+					response.msg = 'No result found';
+				}
+				res.setHeader('Content-Type', 'application/json');
+				res.status(200).send(JSON.stringify(response));
+			}
+			else {
+				console.log("elseerr", err);
+				res.status(400).send(err);
+			}
+		});
+	
 }
 
 exports.getCampaignHeroImages = function (args, res, next) {
