@@ -712,17 +712,21 @@ exports.getShopDataByShopName = function (args, res, next) {
 
 exports.getMerchantData = function (args, res, next) {
 	var response = {};
-	var merchantID = /[^/]*$/.exec(args.url)[0];
+	var merchantID = args.swagger.params.merchantID.value;
 	async.waterfall([
 		getPersonalData.bind(null, merchantID),
 		getBillingData,
 		getSocialChannels
 
 	], function (err, result) {
-		//connection.end();
-		console.log("Error in waterfall");
-		console.log(err);
-		//callback(err, result);
+		if(!err){
+			response.result = 'success';
+			res.setHeader('Content-Type', 'application/json');
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			res.status(200).send(JSON.stringify(response));
+		}else{
+			res.status(400).send(JSON.stringify(err));
+		}
 	});
 
 	function getPersonalData(merchantID, callback) {
@@ -757,20 +761,17 @@ exports.getMerchantData = function (args, res, next) {
 				callback(null, err);
 			}
 		});
-
 	}
 
-	function getSocialChannels() {
+	function getSocialChannels(result, callback) {
 		connection.query('SELECT * from tbl_channels where merchantID = ?', merchantID, function (err, channelsresult, fields) {
 			console.log(this.sql);
 			if (!err && channelsresult.length > 0) {
 				response.data.socialChannels = channelsresult[0];
-				response.result = 'success';
-				res.setHeader('Content-Type', 'application/json');
-				res.setHeader('Access-Control-Allow-Origin', '*');
-				res.status(200).send(JSON.stringify(response));
+				callback(null, response);
+			}else{
+				callback(null, response);
 			}
-
 		});
 	}
 }
