@@ -127,7 +127,7 @@ function insertNewMerchant(data, res) {
 				response.result = 'success';
 				response.msg = 'New merchant created';
 				res.setHeader('Content-Type', 'application/json');
-				return res.status(200).send(JSON.stringify(response));
+				return res.status(200).send(JSON.stringify(insertMerchantID));
 			} else {
 				console.log("err", err);
 				console.log("errresult", result);
