@@ -58,3 +58,8 @@ typings/
 .env
 
 config.js
+
+
+/public/hero_images
+/public/images
+/public/profile-images
