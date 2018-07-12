@@ -25,11 +25,9 @@ if (HOSTNAME.indexOf('https') != -1) {
 } else {
 	var http = require('http');
 }
-import connection from '../../config';
-import signupWithStripe from './SignupWithStripe';
-import handleChangeSubscription from './SubscriptionChange';
-import handleCancelSubscription from './SubscriptionCancel';
-import handleUpdatePayment from './Payment';
+
+const connection = require('../../config.js');
+
 
 app.use(function (req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');

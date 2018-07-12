@@ -1,6 +1,6 @@
 'use strict';
 
-var fs = require('fs'),
+vstriar fs = require('fs'),
 	path = require('path'),
 	http = require('http'),
     https     = require('https'),
