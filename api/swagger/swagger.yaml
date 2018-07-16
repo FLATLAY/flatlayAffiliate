@@ -59,8 +59,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /updateMerchant:
     post:
@@ -86,8 +84,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /connectAccount/{SHOP}:
     get:
@@ -258,8 +254,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /products:
     get:
@@ -278,8 +272,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /priceSegment:
     get:
@@ -298,8 +290,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /getPlans:
     get:
@@ -318,8 +308,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /getCountry:
     get:
@@ -338,8 +326,6 @@ paths:
           description: "Bad Syntax/ Invalid data"
         500:
           description: "Internal server error"
-        default:
-          description: "successful operation"
       x-swagger-router-controller: "UserService"
   /getStateByCountry/{countryCode}:
     get:
@@ -1082,8 +1068,6 @@ definitions:
         type: "string"
       file:
         type: "string"
-    xml:
-      name: "User"
   Billing:
     type: "object"
     properties:
@@ -1118,8 +1102,6 @@ definitions:
         type: "boolean"
       saveBillingInfo:
         type: "boolean"
-    xml:
-      name: "Billing"
   UpdateSocialChannels:
     type: "object"
     properties:
