@@ -12,7 +12,7 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 const uuidv1 = require('uuid/v1');
-var connection = require('./config.js');
+
 //import connection from './config';
 var url = require('url');
 var cors = require('cors');
@@ -20,6 +20,7 @@ var moment = require('moment');
 //New Setup express
 var app = express();
 var logger = require('morgan');
+const connection = require('./config.js');
 const dotenv = require('dotenv').config();
 const crypto = require('crypto');
 const cookie = require('cookie');
@@ -241,7 +242,6 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 	});
 
 	app.get('/shopify/callback', (req, res) => {
-		// EX. shop will be ipsteststore.myshopify.com here
 		const { shop, hmac, code, state } = req.query;
    // const stateCookie = cookie.parse(req.headers.cookie).state;
 
@@ -251,29 +251,29 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
 		if (shop && hmac && code) {
 			// DONE: Validate request is from Shopify
-			const map = Object.assign({}, req.query);
-			delete map['signature'];
-			delete map['hmac'];
-			const message = querystring.stringify(map);
-			const providedHmac = Buffer.from(hmac, 'utf-8');
-			const generatedHash = Buffer.from(
-				crypto
-					.createHmac('sha256', APISECRET)
-					.update(message)
-					.digest('hex'),
-				'utf-8'
-			);
-			let hashEquals = false;
+			// const map = Object.assign({}, req.query);
+			// delete map['signature'];
+			// delete map['hmac'];
+			// const message = querystring.stringify(map);
+			// const providedHmac = Buffer.from(hmac, 'utf-8');
+			// const generatedHash = Buffer.from(
+			// 	crypto
+			// 		.createHmac('sha256', APISECRET)
+			// 		.update(message)
+			// 		.digest('hex'),
+			// 	'utf-8'
+			// );
+			// let hashEquals = false;
 
-			try {
-				hashEquals = crypto.timingSafeEqual(generatedHash, providedHmac)
-			} catch (e) {
-				hashEquals = false;
-			};
+			// try {
+			// 	hashEquals = crypto.timingSafeEqual(generatedHash, providedHmac)
+			// } catch (e) {
+			// 	hashEquals = false;
+			// };
 
-			if (!hashEquals) {
-				return res.status(400).send('HMAC validation failed');
-			}
+			// if (!hashEquals) {
+			// 	return res.status(400).send('HMAC validation failed');
+			// }
 
 			// DONE: Exchange temporary code for a permanent access token
 			const accessTokenRequestUrl = 'https://' + shop + '/admin/oauth/access_token';
@@ -452,12 +452,18 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 	});
 
 
-	reload(app);
+	//reload(app);
 
 	// Create server
-	http.createServer(app).listen(app.get('port'), function () {
-		console.log('Server listening on port ' + app.get('port'));
+	// http.createServer(app).listen(app.get('port'), function () {
+	// 	console.log('Server listening on port ' + app.get('port'));
+	// });
+
+	// Create server
+	var server = app.listen(app.get('port'), function() {
+	  console.log('Server listening on port ' + app.get('port'));
 	});
+	server.timeout = 600000;
 
 
 
