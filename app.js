@@ -12,7 +12,7 @@ var connect = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 const uuidv1 = require('uuid/v1');
-//var connection = require('./config.js');
+var connection = require('./config.js');
 //import connection from './config';
 var url = require('url');
 var cors = require('cors');
