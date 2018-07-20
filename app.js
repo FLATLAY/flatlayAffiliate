@@ -378,15 +378,15 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 				{
 					'content-type': 'application/json',
 					'x-shopify-access-token': accessToken,
-					host: 'paxsun.myshopify.com'
+					'host': shopName+'.myshopify.com'
 				},
 				body:
 				{
-					webhook:
+					'webhook':
 					{
-						topic: 'products/create',
-              address: 'https://affiliate.flat-lay.com/webhook/createProduct',
-						format: 'json'
+						'topic': 'product_listings/add',
+              			'address': 'https://affiliate.flat-lay.com/webhook/createProduct',
+						'format': 'json'
 					}
 				},
 				json: true
@@ -404,15 +404,15 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 				{
 					'content-type': 'application/json',
 					'x-shopify-access-token': accessToken,
-					host: 'paxsun.myshopify.com'
+					'host': shopName+'.myshopify.com'
 				},
 				body:
 				{
-					webhook:
+					'webhook':
 					{
-						topic: 'products/delete',
-              address: 'https://affiliate.flat-lay.com/webhook/deleteProduct',
-						format: 'json'
+						'topic': 'product_listings/remove',
+              			'address': 'https://affiliate.flat-lay.com/webhook/deleteProduct',
+						'format': 'json'
 					}
 				},
 				json: true
@@ -430,15 +430,15 @@ swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 				{
 					'content-type': 'application/json',
 					'x-shopify-access-token': accessToken,
-					host: 'paxsun.myshopify.com'
+					'host': shopName+'.myshopify.com'
 				},
 				body:
 				{
-					webhook:
+					'webhook':
 					{
-						topic: 'app/uninstalled',
-						address: 'https://affiliate.flat-lay.com/webhook/removeSaleschannel',
-						format: 'json'
+						'topic': 'app/uninstalled',
+						'address': 'https://affiliate.flat-lay.com/webhook/removeSaleschannel',
+						'format': 'json'
 					}
 				},
 				json: true
