@@ -2062,3 +2062,36 @@ exports.handleUpdatePayment = function (args, res, next) {
 		res.status(200).send(JSON.stringify(result));
 	}).catch(err => res.status(400).send(err));
 }
+
+exports.productListings = function(args, res1, next){
+	var response = {};
+	// GET to token page then make call to v1.flat-lay.com/externaltoken
+	//put token into request to shopify and return object 
+	var SHOP = /[^/]*$/.exec(args.url)[0];
+	console.log("Shop", SHOP);
+	var response = {};
+
+	http.get(HOSTNAME + '/getAccessToken/' + SHOP, function (res2) {
+		res2.on('data', function (chunk) {
+			var chunkObj = JSON.parse(chunk);
+			var options = {
+				method: 'GET',
+				url: 'https://'+ SHOP + '.myshopify.com/admin/product_listings.json',
+				headers: {
+					'X-Shopify-Access-Token': chunkObj.accessToken
+				}
+			};
+
+			request(options, function (error, response, body) {
+				if (error)
+					res1.status(400).send(response);
+				console.log(body);
+				res1.status(200).send(response);
+			});
+		});
+
+	}).on('error', function (e) {
+		console.error(e);
+		res1.status(400).send("error", error);
+	});
+}

@@ -85,6 +85,10 @@ module.exports.productList = function productList(req, res, next) {
 	User.productList(req.swagger.params, res, next);
 };
 
+module.exports.productListings = function productListings(req, res, next) {
+	User.productListings(req.swagger.params, res, next);
+};
+
 module.exports.productInfo = function productInfo(req, res, next) {
 	User.productInfo(req.swagger.params, res, next);
 };
