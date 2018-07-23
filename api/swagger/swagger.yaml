@@ -475,6 +475,28 @@ paths:
         400:
           description: "Invalid shop name or access token"
       x-swagger-router-controller: "UserService"
+  /productListings/{SHOP}:
+    get:
+      tags:
+      - "shopify"
+      summary: "Get product listings by shop name"
+      description: "Get product listings by shop name"
+      operationId: "productListings"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "SHOP"
+        in: "path"
+        description: "Shop name to query and retrieve product list"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+        400:
+          description: "Invalid shop name or access token"
+      x-swagger-router-controller: "UserService"
   /productInfo:
     post:
       tags:
