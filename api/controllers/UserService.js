@@ -103,36 +103,47 @@ function insertNewMerchant(data, res) {
 	query = 'INSERT INTO tbl_merchant (CompanyName, ShopName, FirstName, LastName, Password,CommissionType,CommissionValue,Email, WebUrl, ProductID, PriceSegmentID, TargetAudience, StreetAddress, City, zipCode, CountryID, StateID, PhoneNumber, PlanID, CreateDate )\
            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
 
-	connection.query(query,
-		[companyName, shopName, firstName, lastName, password, commissionType, commissionValue, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
-		function (err, result) {
-			if (!err) {
-				insertMerchantID = result.insertId;
-				if (category) {
-					for (var i = 0; i < category.length; i++) {
-						connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
-                         VALUES (?,?,?)',
-							[insertMerchantID, category[i], moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
-							function (err, result) {
-								if (!err) {
-									console.log(this.sql);
-								} else {
-									console.log(err);
-								}
-							});
+	connection.query('SELECT * from tbl_merchant where Email = ?', email, function (err, result, fields) {
+		if (!err && result.length > 0) {
+			response.result = 'error';
+			response.msg = 'Merchant with this email already exists';
+			res.setHeader('Content-Type', 'application/json');
+			return res.status(200).send(JSON.stringify(response));
+			//updateExistingMerchant(args.body,res);
+		} else {
+			connection.query(query,
+			[companyName, shopName, firstName, lastName, password, commissionType, commissionValue, email, webUrl, productID, priceSegmentID, targetAudience, streetAddress, city, zipCode, countryID, stateID, phoneNumber, planID, createDate],
+			function (err, result) {
+				if (!err) {
+					insertMerchantID = result.insertId;
+					if (category) {
+						for (var i = 0; i < category.length; i++) {
+							connection.query('INSERT INTO tbl_merchant_category (MerchantID, CategoryID, CreateDate )\
+	                         VALUES (?,?,?)',
+								[insertMerchantID, category[i], moment(Date.now()).format('YYYY-MM-DD HH:mm:ss')],
+								function (err, result) {
+									if (!err) {
+										console.log(this.sql);
+									} else {
+										console.log(err);
+									}
+								});
+						}
 					}
+					response.merchantID = insertMerchantID;
+					response.result = 'success';
+					response.msg = 'New merchant created';
+					res.setHeader('Content-Type', 'application/json');
+					return res.status(200).send(JSON.stringify(response));
+				} else {
+					console.log("err", err);
+					console.log("errresult", result);
+					return res.status(400).send(err);
 				}
-				response.merchantID = insertMerchantID;
-				response.result = 'success';
-				response.msg = 'New merchant created';
-				res.setHeader('Content-Type', 'application/json');
-				return res.status(200).send(JSON.stringify(response));
-			} else {
-				console.log("err", err);
-				console.log("errresult", result);
-				return res.status(400).send(err);
-			}
-		});
+			});	
+		}
+	});
+
 }
 
 function updateExistingMerchant(data, res) {
